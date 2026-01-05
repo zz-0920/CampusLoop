@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3b82f6;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-content: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f0f2f5; /* Set background color from design */
+  color: #333;
+}
+
+#root {
+  width: 100%;
+  max-width: 500px; /* Mobile first constraint */
+  background-color: white;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar for a cleaner look */
+::-webkit-scrollbar {
+  width: 0px;
+}
