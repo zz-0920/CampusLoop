@@ -87,7 +87,7 @@ const Publish: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white p-4">
+    <div className="flex flex-col h-screen overflow-y-auto bg-white p-4">
       {/* 1. Header */}
       <div className="flex justify-between items-center mb-6">
         <button onClick={() => navigate(-1)} className="text-gray-400">

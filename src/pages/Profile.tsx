@@ -98,7 +98,7 @@ const Profile: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 pb-20">
+    <div className="h-screen overflow-y-auto bg-gray-50 pb-20">
       {/* 1. Header with Gradient */}
       <div className="relative h-48 bg-linear-to-br from-blue-500 to-cyan-400 p-6 flex items-end">
         <button className="absolute top-6 right-6 text-white bg-white/20 p-2 rounded-full backdrop-blur-sm">

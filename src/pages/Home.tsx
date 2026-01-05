@@ -42,7 +42,7 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-full bg-gray-50">
+    <div className="h-screen overflow-y-auto bg-gray-50">
       {/* Fixed Header */}
       <div className="fixed top-0 left-0 right-0 z-30 w-full max-w-md mx-auto bg-gray-50/95 backdrop-blur-sm pt-4 px-4 pb-2 shadow-sm transition-all duration-300">
         {/* Search Header */}

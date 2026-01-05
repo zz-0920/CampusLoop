@@ -37,7 +37,7 @@ const Discover: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-20">
+    <div className="h-screen overflow-y-auto flex flex-col gap-6 pb-20">
       {/* 1. Discover Friends (Matching Card) */}
       <section className="px-4 pt-4">
         <div className="flex items-center justify-between mb-3">

@@ -19,23 +19,29 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
 body {
   margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
   display: flex;
   place-content: center;
   min-width: 320px;
-  min-height: 100vh;
-  background-color: #f0f2f5; /* Set background color from design */
+  background-color: #f0f2f5;
   color: #333;
 }
 
 #root {
   width: 100%;
-  max-width: 500px; /* Mobile first constraint */
+  max-width: 500px;
   background-color: white;
-  min-height: 100vh;
+  height: 100%;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* Custom scrollbar for a cleaner look */
