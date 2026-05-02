@@ -75,7 +75,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
+    <div className="glass rounded-3xl p-5 shadow-lg mb-6 elastic-press">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div
@@ -99,7 +99,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             </div>
           </div>
         </div>
-        <button className="text-gray-400">
+        <button className="text-gray-400 hover:text-gray-600 transition-colors">
           <MoreHorizontal size={20} />
         </button>
       </div>
@@ -117,19 +117,22 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             const images = post.image.split(",").filter(Boolean);
             if (images.length === 1) {
               return (
-                <img
-                  src={images[0]}
-                  alt="Post content"
-                  loading="lazy"
-                  className="w-full h-48 object-cover rounded-xl"
-                />
+                <div className="relative group">
+                  <img
+                    src={images[0]}
+                    alt="Post content"
+                    loading="lazy"
+                    className="w-full h-48 object-cover rounded-2xl border border-white/10"
+                  />
+                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 pointer-events-none" />
+                </div>
               );
             }
             // Multiple images: grid layout
             const gridCols = images.length <= 2 ? "grid-cols-2" : "grid-cols-3";
             return (
               <div
-                className={`grid ${gridCols} gap-1 rounded-xl overflow-hidden`}
+                className={`grid ${gridCols} gap-1.5 rounded-2xl overflow-hidden border border-white/10 relative`}
               >
                 {images.slice(0, 9).map((img, index) => (
                   <img
@@ -140,6 +143,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                     className="w-full aspect-square object-cover"
                   />
                 ))}
+                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 pointer-events-none" />
               </div>
             );
           })()}
@@ -150,33 +154,36 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         <div className="flex items-center gap-6">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-1 transition-colors ${
-              isLiked ? "text-red-500" : "hover:text-red-500"
+            className={`flex items-center gap-1 transition-all duration-300 elastic-press ${
+              isLiked ? "text-red-500 scale-105" : "hover:text-red-500"
             }`}
           >
-            <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
-            <span className="text-xs">{likes}</span>
+            <Heart 
+              size={18} 
+              fill={isLiked ? "currentColor" : "none"} 
+              className={isLiked ? "animate-pulse" : ""}
+            />
+            <span className="text-xs font-medium">{likes}</span>
           </button>
           <button
             onClick={() => navigate(`/post/${post.id}`)}
-            className="flex items-center gap-1 hover:text-primary transition-colors"
+            className="flex items-center gap-1 hover:text-primary transition-colors elastic-press"
           >
             <MessageCircle size={18} />
-            <span className="text-xs">{post.comments || 0}</span>
+            <span className="text-xs font-medium">{post.comments || 0}</span>
           </button>
           <button
             onClick={handleBookmark}
-            className={`flex items-center gap-1 transition-colors ${
+            className={`flex items-center gap-1 transition-colors elastic-press ${
               isBookmarked ? "text-yellow-500" : "hover:text-yellow-500"
             }`}
           >
             <Bookmark size={18} fill={isBookmarked ? "currentColor" : "none"} />
-            <span className="text-xs">{bookmarkCount}</span>
+            <span className="text-xs font-medium">{bookmarkCount}</span>
           </button>
         </div>
-        <button className="flex items-center gap-1 hover:text-primary transition-colors">
+        <button className="flex items-center gap-1 hover:text-primary transition-colors elastic-press">
           <Share2 size={18} />
-          {/* <span className="text-xs">{post.shares || 0}</span> Optional share count */}
         </button>
       </div>
     </div>

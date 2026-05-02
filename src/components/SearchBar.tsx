@@ -102,8 +102,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      <div className="bg-gray-100 rounded-full flex items-center px-4 py-2 gap-2 text-gray-400">
-        <Search size={18} />
+      <div className="glass rounded-full flex items-center px-5 py-2.5 gap-3 text-gray-400 shadow-inner border border-white/20 transition-all duration-300 focus-within:ring-2 focus-within:ring-white/30">
+        <Search size={18} className="text-gray-500" />
         <input
           type="text"
           value={query}
@@ -111,12 +111,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           onFocus={() => query.trim() && results && setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="bg-transparent border-none focus:outline-none text-sm text-gray-800 w-full placeholder:text-gray-400"
+          className="bg-transparent border-none focus:outline-none text-sm text-gray-800 w-full placeholder:text-gray-500/70"
         />
         {query && (
           <button
             onClick={handleClear}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 transition-colors p-0.5 hover:bg-white/10 rounded-full"
           >
             <X size={16} />
           </button>
@@ -125,21 +125,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Search Results Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 max-h-80 overflow-y-auto z-50">
+        <div className="absolute top-full left-0 right-0 mt-3 glass rounded-2xl shadow-2xl border border-white/30 max-h-80 overflow-y-auto z-50 backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-300">
           {loading ? (
-            <div className="p-4 text-center text-gray-400 text-sm">
+            <div className="p-6 text-center text-gray-500 text-sm font-medium">
               搜索中...
             </div>
           ) : !hasResults ? (
-            <div className="p-4 text-center text-gray-400 text-sm">
+            <div className="p-6 text-center text-gray-500 text-sm font-medium">
               无搜索结果
             </div>
           ) : (
-            <>
+            <div className="p-2 space-y-1">
               {/* Users */}
               {results?.users && results.users.length > 0 && (
-                <div className="p-2">
-                  <div className="text-xs text-gray-400 px-2 mb-2">用户</div>
+                <div>
+                  <div className="text-[10px] font-bold text-gray-500/80 uppercase tracking-wider px-3 py-2">用户</div>
                   {results.users.slice(0, 5).map((user) => (
                     <div
                       key={user.id}
@@ -147,14 +147,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         setIsOpen(false);
                         navigate(`/user/${user.id}`);
                       }}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center gap-3 p-2.5 hover:bg-white/20 rounded-xl cursor-pointer transition-colors group"
                     >
                       <Avatar src={user.avatar} alt={user.name} size="sm" />
                       <div>
-                        <div className="text-sm font-medium text-gray-800">
+                        <div className="text-sm font-bold text-gray-800 group-hover:text-primary transition-colors">
                           {user.name}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-[10px] text-gray-500">
                           {user.school}
                         </div>
                       </div>
@@ -165,8 +165,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
               {/* Clubs */}
               {results?.clubs && results.clubs.length > 0 && (
-                <div className="p-2 border-t border-gray-50">
-                  <div className="text-xs text-gray-400 px-2 mb-2">社团</div>
+                <div className="pt-2 border-t border-white/10">
+                  <div className="text-[10px] font-bold text-gray-500/80 uppercase tracking-wider px-3 py-2">社团</div>
                   {results.clubs.slice(0, 5).map((club) => (
                     <div
                       key={club.id}
@@ -174,19 +174,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
                         // TODO: Navigate to club detail page
                         console.log("Club clicked", club.id);
                       }}
-                      className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="flex items-center gap-3 p-2.5 hover:bg-white/20 rounded-xl cursor-pointer transition-colors group"
                     >
                       <Avatar
                         src={club.logo}
                         alt={club.name}
                         size="sm"
                         shape="square"
+                        className="rounded-lg"
                       />
                       <div>
-                        <div className="text-sm font-medium text-gray-800">
+                        <div className="text-sm font-bold text-gray-800 group-hover:text-primary transition-colors">
                           {club.name}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-[10px] text-gray-500">
                           成员 {club.memberCount}
                         </div>
                       </div>
@@ -197,22 +198,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
               {/* Posts */}
               {results?.posts && results.posts.length > 0 && (
-                <div className="p-2 border-t border-gray-50">
-                  <div className="text-xs text-gray-400 px-2 mb-2">帖子</div>
+                <div className="pt-2 border-t border-white/10">
+                  <div className="text-[10px] font-bold text-gray-500/80 uppercase tracking-wider px-3 py-2">帖子</div>
                   {results.posts.slice(0, 5).map((post) => (
                     <div
                       key={post.id}
                       onClick={() => handlePostClick(post.id)}
-                      className="p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                      className="p-2.5 hover:bg-white/20 rounded-xl cursor-pointer transition-colors group"
                     >
-                      <div className="text-sm text-gray-800 line-clamp-2">
+                      <div className="text-sm text-gray-700 line-clamp-2 group-hover:text-gray-900 leading-relaxed">
                         {post.content}
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       )}
