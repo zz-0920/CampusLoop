@@ -1,12 +1,10 @@
 import React from "react";
 
-interface AvatarProps {
+interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   src?: string;
   alt?: string;
   size?: "sm" | "md" | "lg" | "xl";
   isVerified?: boolean;
-  className?: string;
-  [key: string]: any;
 }
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -17,7 +15,7 @@ const Avatar: React.FC<AvatarProps> = ({
   className = "",
   ...props
 }) => {
-  const sizeClasses: any = {
+  const sizeClasses: Record<string, string> = {
     sm: "w-8 h-8",
     md: "w-12 h-12",
     lg: "w-20 h-20",
