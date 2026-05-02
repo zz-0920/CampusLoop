@@ -24,7 +24,7 @@ const CreateClub: React.FC = () => {
     try {
       const res = await uploadImage(file);
       setLogo(res.url);
-    } catch (err) {
+    } catch {
       setError("图片上传失败");
     } finally {
       setIsUploading(false);
@@ -43,7 +43,7 @@ const CreateClub: React.FC = () => {
     try {
       await createClub({ name, description, logo });
       navigate("/discover"); // Success navigation
-    } catch (err) {
+    } catch {
       setError("创建社团失败，请重试");
     } finally {
       setIsSubmitting(false);

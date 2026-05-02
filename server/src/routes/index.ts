@@ -6,6 +6,7 @@ import discoverRoutes from "./discoverRoutes.js";
 import messageRoutes from "./messageRoutes.js";
 import uploadRoutes from "./uploadRoutes.js";
 import interactionRoutes from "./interactionRoutes.js";
+import clubRoutes from "./clubRoutes.js";
 
 const router = new Router();
 
@@ -27,6 +28,7 @@ router.use(
   interactionRoutes.routes(),
   interactionRoutes.allowedMethods()
 ); // /api/interactions
+router.use("/clubs", clubRoutes.routes(), clubRoutes.allowedMethods()); // /api/clubs
 router.use(uploadRoutes.routes(), uploadRoutes.allowedMethods()); // /api/upload
 
 export default router;
