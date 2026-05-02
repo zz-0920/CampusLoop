@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+docs/superpowers/plans
+docs/superpowers/specs
 
 # Editor directories and files
 .vscode/*
