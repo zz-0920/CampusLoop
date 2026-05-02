@@ -75,7 +75,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <div className="glass rounded-3xl p-5 shadow-lg mb-6 elastic-press">
+    <div className="bg-white border-b border-gray-100 py-8 px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div
@@ -89,11 +89,11 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           />
           <div>
             <div className="flex items-center gap-1">
-              <span className="font-bold text-gray-800 text-sm hover:text-primary transition-colors">
+              <span className="font-semibold text-black text-base transition-colors">
                 {post.author?.name || post.user?.name}
               </span>
             </div>
-            <div className="text-[10px] text-gray-400">
+            <div className="text-xs text-gray-400 mt-0.5">
               {post.author?.school || post.user?.school} ·{" "}
               {post.author?.department || post.user?.department}
             </div>
@@ -106,10 +106,10 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
       {/* Content */}
       <div
-        className="mb-3 cursor-pointer"
+        className="mb-4 cursor-pointer"
         onClick={() => navigate(`/post/${post.id}`)}
       >
-        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+        <p className="text-[15px] text-gray-800 leading-relaxed mb-4">
           {post.content}
         </p>
         {post.image &&
@@ -122,9 +122,8 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                     src={images[0]}
                     alt="Post content"
                     loading="lazy"
-                    className="w-full h-48 object-cover rounded-2xl border border-white/10"
+                    className="w-full h-auto max-h-[400px] object-cover rounded-lg border border-gray-100"
                   />
-                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 pointer-events-none" />
                 </div>
               );
             }
@@ -132,7 +131,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             const gridCols = images.length <= 2 ? "grid-cols-2" : "grid-cols-3";
             return (
               <div
-                className={`grid ${gridCols} gap-1.5 rounded-2xl overflow-hidden border border-white/10 relative`}
+                className={`grid ${gridCols} gap-2 rounded-lg overflow-hidden border border-gray-100 relative`}
               >
                 {images.slice(0, 9).map((img, index) => (
                   <img
@@ -143,46 +142,44 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
                     className="w-full aspect-square object-cover"
                   />
                 ))}
-                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 pointer-events-none" />
               </div>
             );
           })()}
       </div>
 
       {/* Interaction Footer */}
-      <div className="flex items-center justify-between text-gray-400 pt-1">
-        <div className="flex items-center gap-6">
+      <div className="flex items-center justify-between text-gray-400 pt-2">
+        <div className="flex items-center gap-8">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-1 transition-all duration-300 elastic-press ${
-              isLiked ? "text-red-500 scale-105" : "hover:text-red-500"
+            className={`flex items-center gap-1.5 transition-colors ${
+              isLiked ? "text-red-500" : "hover:text-black"
             }`}
           >
             <Heart 
               size={18} 
               fill={isLiked ? "currentColor" : "none"} 
-              className={isLiked ? "animate-pulse" : ""}
             />
             <span className="text-xs font-medium">{likes}</span>
           </button>
           <button
             onClick={() => navigate(`/post/${post.id}`)}
-            className="flex items-center gap-1 hover:text-primary transition-colors elastic-press"
+            className="flex items-center gap-1.5 hover:text-black transition-colors"
           >
             <MessageCircle size={18} />
             <span className="text-xs font-medium">{post.comments || 0}</span>
           </button>
           <button
             onClick={handleBookmark}
-            className={`flex items-center gap-1 transition-colors elastic-press ${
-              isBookmarked ? "text-yellow-500" : "hover:text-yellow-500"
+            className={`flex items-center gap-1.5 transition-colors ${
+              isBookmarked ? "text-yellow-500" : "hover:text-black"
             }`}
           >
             <Bookmark size={18} fill={isBookmarked ? "currentColor" : "none"} />
             <span className="text-xs font-medium">{bookmarkCount}</span>
           </button>
         </div>
-        <button className="flex items-center gap-1 hover:text-primary transition-colors elastic-press">
+        <button className="flex items-center gap-1 hover:text-black transition-colors">
           <Share2 size={18} />
         </button>
       </div>
