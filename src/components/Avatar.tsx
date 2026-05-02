@@ -5,44 +5,41 @@ interface AvatarProps {
   alt?: string;
   size?: "sm" | "md" | "lg" | "xl";
   isVerified?: boolean;
-  isOnline?: boolean;
   className?: string;
-  shape?: "circle" | "square";
+  [key: string]: any;
 }
 
 const Avatar: React.FC<AvatarProps> = ({
-  src = "",
-  alt = "",
+  src,
+  alt = "Avatar",
   size = "md",
   isVerified = false,
-  isOnline = false,
   className = "",
-  shape = "circle",
+  ...props
 }) => {
-  const sizeClasses = {
+  const sizeClasses: any = {
     sm: "w-8 h-8",
-    md: "w-10 h-10",
-    lg: "w-14 h-14",
-    xl: "w-20 h-20",
+    md: "w-12 h-12",
+    lg: "w-20 h-20",
+    xl: "w-24 h-24",
   };
 
-  const roundedClass = shape === "square" ? "rounded-xl" : "rounded-full";
-
   return (
-    <div className={`relative ${sizeClasses[size]} ${className}`}>
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        className={`w-full h-full ${roundedClass} object-cover border border-gray-100`}
-      />
+    <div 
+      className={`relative ${sizeClasses[size] || sizeClasses.md} rounded-full p-[2px] bg-gradient-to-tr from-primary via-accent to-secondary ${className}`} 
+      {...props}
+    >
+      <div className="w-full h-full rounded-full overflow-hidden glass border-0">
+        <img
+          src={src || "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"}
+          alt={alt}
+          className="w-full h-full object-cover"
+        />
+      </div>
       {isVerified && (
-        <div className="absolute -bottom-0.5 -right-0.5 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center p-0.5">
-          <span className="text-[6px] text-white font-bold italic">v</span>
+        <div className="absolute bottom-0 right-0 w-1/4 h-1/4 bg-accent rounded-full border-2 border-white flex items-center justify-center">
+          <div className="w-1/2 h-1/2 bg-white rounded-full" />
         </div>
-      )}
-      {isOnline && (
-        <div className="absolute -top-0.5 -right-0.5 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
       )}
     </div>
   );
