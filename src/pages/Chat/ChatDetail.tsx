@@ -146,13 +146,13 @@ const ChatDetail: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-transparent font-display">
+    <div className="flex flex-col h-screen bg-white font-display">
       {/* Header */}
-      <div className="glass backdrop-blur-xl px-4 py-3 flex items-center justify-between sticky top-0 z-10 border-b-0">
+      <div className="bg-white px-4 py-3 flex items-center justify-between sticky top-0 z-10 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate(-1)} 
-            className="text-gray-800 p-1 hover:bg-white/20 rounded-full transition-colors elastic-press"
+            className="text-black p-1 hover:bg-gray-100 rounded-full transition-colors"
           >
             <ChevronLeft size={24} />
           </button>
@@ -166,28 +166,28 @@ const ChatDetail: React.FC = () => {
               size="sm"
             />
             <div>
-              <h2 className="font-bold text-gray-800 text-sm leading-tight">
+              <h2 className="font-bold text-black text-sm leading-tight">
                 {contactUser?.name || `用户 ${contactId}`}
               </h2>
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                 <span className="text-[10px] text-gray-500 font-medium">在线</span>
               </div>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-4 text-gray-700">
-          <button className="p-2 hover:bg-white/20 rounded-full transition-colors elastic-press">
+        <div className="flex items-center gap-4 text-black">
+          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <Phone size={20} />
           </button>
-          <button className="p-2 hover:bg-white/20 rounded-full transition-colors elastic-press">
+          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <Video size={20} />
           </button>
         </div>
       </div>
 
       {/* Message Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-white">
         {messages.map((msg, index) => {
           const isMe = msg.senderId === currentUser?.id;
           const showTime = shouldShowTime(index);
@@ -197,7 +197,7 @@ const ChatDetail: React.FC = () => {
               {/* Time separator */}
               {showTime && msg.createdAt && (
                 <div className="flex justify-center my-4">
-                  <span className="text-[10px] font-bold text-gray-500/80 uppercase tracking-wider glass px-3 py-1 rounded-full">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 py-1">
                     {formatMessageTime(msg.createdAt)}
                   </span>
                 </div>
@@ -223,10 +223,10 @@ const ChatDetail: React.FC = () => {
                   } max-w-[70%]`}
                 >
                   <div
-                    className={`px-4 py-2.5 rounded-2xl text-sm shadow-sm cursor-default elastic-press ${
+                    className={`px-4 py-2.5 rounded-xl text-sm border cursor-default ${
                       isMe
-                        ? "bg-gradient-to-r from-accent to-secondary-light text-white rounded-tr-none"
-                        : "glass text-gray-800 rounded-tl-none font-medium"
+                        ? "bg-black text-white border-black"
+                        : "bg-gray-100 text-black border-gray-100"
                     }`}
                   >
                     {msg.content}
@@ -240,26 +240,27 @@ const ChatDetail: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 sticky bottom-0 z-10">
-        <div className="glass rounded-full p-2 pr-2 flex items-center gap-2 shadow-lg backdrop-blur-xl">
+      <div className="p-4 bg-white border-t border-gray-100 sticky bottom-0 z-10">
+        <div className="flex items-center gap-2">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="打个招呼吧..."
-            className="flex-1 bg-transparent border-none px-4 py-2 text-sm text-gray-800 placeholder-gray-500 focus:ring-0 outline-none font-medium"
+            className="flex-1 bg-gray-50 border border-gray-100 rounded-full px-4 py-2 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors"
           />
           <button
             onClick={handleSend}
             disabled={!inputValue.trim()}
-            className="p-3 bg-gradient-to-r from-primary to-primary-light text-white rounded-full shadow-lg hover:brightness-110 disabled:opacity-30 disabled:grayscale transition-all elastic-press"
+            className="p-3 bg-black text-white rounded-full disabled:opacity-30 disabled:grayscale transition-all"
           >
             <Send size={18} />
           </button>
         </div>
       </div>
     </div>
+
   );
 };
 
