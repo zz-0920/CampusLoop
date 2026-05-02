@@ -5,6 +5,7 @@ interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   alt?: string;
   size?: "sm" | "md" | "lg" | "xl";
   isVerified?: boolean;
+  shape?: "circle" | "square";
 }
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -12,6 +13,7 @@ const Avatar: React.FC<AvatarProps> = ({
   alt = "Avatar",
   size = "md",
   isVerified = false,
+  shape = "circle",
   className = "",
   ...props
 }) => {
@@ -22,12 +24,14 @@ const Avatar: React.FC<AvatarProps> = ({
     xl: "w-24 h-24",
   };
 
+  const roundedClass = shape === "circle" ? "rounded-full" : "rounded-lg";
+
   return (
     <div 
-      className={`relative ${sizeClasses[size] || sizeClasses.md} rounded-full p-[2px] bg-gradient-to-tr from-primary via-accent to-secondary ${className}`} 
+      className={`relative ${sizeClasses[size] || sizeClasses.md} ${roundedClass} p-[1px] bg-gray-100 ${className}`} 
       {...props}
     >
-      <div className="w-full h-full rounded-full overflow-hidden glass border-0">
+      <div className={`w-full h-full ${roundedClass} overflow-hidden border border-gray-100 bg-white`}>
         <img
           src={src || "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"}
           alt={alt}
@@ -35,9 +39,7 @@ const Avatar: React.FC<AvatarProps> = ({
         />
       </div>
       {isVerified && (
-        <div className="absolute bottom-0 right-0 w-1/4 h-1/4 bg-accent rounded-full border-2 border-white flex items-center justify-center">
-          <div className="w-1/2 h-1/2 bg-white rounded-full" />
-        </div>
+        <div className="absolute bottom-0.5 right-0.5 w-3 h-3 bg-black rounded-full border border-white" />
       )}
     </div>
   );
