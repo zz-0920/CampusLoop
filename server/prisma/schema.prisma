@@ -27,6 +27,7 @@ model User {
   interactions Interaction[]
   followedBy   Follow[]      @relation("followedBy")
   following    Follow[]      @relation("following")
+  clubs       Club[]   @relation("OwnedClubs")
 
   @@map("users")
 }
@@ -62,7 +63,10 @@ model Club {
   logo        String?
   description String?  @db.Text
   memberCount Int      @default(0) @map("member_count")
+  ownerId     Int      @map("owner_id")
   createdAt   DateTime @default(now()) @map("created_at")
+  
+  owner       User     @relation("OwnedClubs", fields: [ownerId], references: [id])
 
   @@map("clubs")
 }
