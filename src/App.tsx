@@ -24,7 +24,7 @@ const ChatDetail = React.lazy(() => import("./pages/Chat/ChatDetail"));
 
 // Page loading spinner component
 const PageLoadingSpinner = () => (
-  <div className="flex items-center justify-center h-screen bg-transparent">
+  <div className="flex items-center justify-center h-screen bg-white">
     <div className="flex flex-col items-center gap-3">
       <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full" />
       <span className="text-gray-400 text-sm">加载中...</span>
@@ -73,7 +73,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     >
       <main
         id="main-scroll-container"
-        className="flex-1 overflow-y-auto w-full max-w-md mx-auto bg-transparent min-h-screen relative"
+        className="flex-1 overflow-y-auto w-full max-w-md mx-auto bg-white min-h-screen relative"
       >
         <Suspense fallback={<PageLoadingSpinner />}>{children}</Suspense>
       </main>
