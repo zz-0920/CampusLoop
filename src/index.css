@@ -2,41 +2,11 @@
 
 @theme {
   --font-display: "Plus Jakarta Sans", sans-serif;
-  --color-primary: #FF7E5F;
-  --color-primary-light: #FEB47B;
-  --color-secondary: #6A11CB;
-  --color-secondary-light: #2575FC;
-  --color-accent: #00D2FF;
-  
-  --radius-xl: 24px;
-  --radius-2xl: 32px;
-
-  --animate-mesh: mesh 20s ease infinite;
-  
-  @keyframes mesh {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-}
-
-@utility glass {
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-@utility glass-dark {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@utility elastic-press {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  &:active {
-    transform: scale(0.95);
-  }
+  --color-primary: #000000;
+  --color-primary-soft: #333333;
+  --color-secondary: #666666;
+  --color-border: #F2F2F2;
+  --color-bg-gray: #F9FAFB;
 }
 
 :root {
@@ -51,10 +21,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* Global Mesh Gradient */
-  background: linear-gradient(-45deg, #FF7E5F, #FEB47B, #6A11CB, #2575FC);
-  background-size: 400% 400%;
-  animation: mesh 20s ease infinite;
+  background-color: #F9FAFB; /* Light gray page background to contrast the white container */
+  color: #000000;
   display: flex;
   justify-content: center;
 }
@@ -63,9 +31,22 @@ body {
   width: 100%;
   max-width: 500px;
   min-height: 100vh;
+  background-color: #FFFFFF;
   position: relative;
+  box-shadow: 0 0 1px rgba(0,0,0,0.1); /* Very subtle boundary */
 }
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
+  color: #000000;
+}
+
+/* Scrollbar cleanup */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+/* Utility for subtle transitions */
+.transition-subtle {
+  transition: all 0.2s ease-in-out;
 }
