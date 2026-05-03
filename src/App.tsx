@@ -25,6 +25,7 @@ const GroupChatDetail = React.lazy(() => import("./pages/Chat/GroupChatDetail"))
 const CreateClub = React.lazy(() => import("./pages/Club/CreateClub"));
 const CreateEvent = React.lazy(() => import("./pages/Event/CreateEvent"));
 const CategoryPosts = React.lazy(() => import("./pages/Post/CategoryPosts"));
+const PaperPlane = React.lazy(() => import("./pages/Toolbox/PaperPlane"));
 
 // Page loading spinner component
 const PageLoadingSpinner = () => (
@@ -45,6 +46,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isSearchPage = location.pathname === "/search";
   const isClubCreatePage = location.pathname === "/clubs/create";
   const isEventCreatePage = location.pathname === "/events/create";
+  const isPaperPlanePage = location.pathname === "/toolbox/paper-plane";
   const hideBottomNav =
     isAuthPage ||
     isChatPage ||
@@ -52,7 +54,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     isUserProfilePage ||
     isSearchPage ||
     isClubCreatePage ||
-    isEventCreatePage;
+    isEventCreatePage ||
+    isPaperPlanePage;
 
   // Scroll to top on route change
   React.useEffect(() => {
@@ -112,6 +115,7 @@ function App() {
             <Route path="/clubs/create" element={<CreateClub />} />
             <Route path="/events/create" element={<CreateEvent />} />
             <Route path="/posts/category/:type" element={<CategoryPosts />} />
+            <Route path="/toolbox/paper-plane" element={<PaperPlane />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </Layout>

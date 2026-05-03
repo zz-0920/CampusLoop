@@ -119,3 +119,7 @@ export const uploadImage = async (file: File): Promise<UploadResponse> => {
     },
   });
 };
+
+export const getRandomPaperPlane = () => {
+  return request.get("/posts/random-paper-plane");
+};
