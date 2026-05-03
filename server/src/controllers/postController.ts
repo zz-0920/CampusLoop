@@ -5,9 +5,11 @@ import prisma from "../utils/prisma.js";
 class PostController {
   // Create a new post
   async create(ctx: Context) {
-    const { content, image } = ctx.request.body as {
+    const { content, image, type, isAnonymous } = ctx.request.body as {
       content?: string;
       image?: string;
+      type?: string;
+      isAnonymous?: boolean;
     };
     const userId = (ctx.state.user as { userId: number }).userId;
 
@@ -23,6 +25,8 @@ class PostController {
         data: {
           content: content?.trim() || "",
           image: image ?? null,
+          type: type || "normal",
+          isAnonymous: !!isAnonymous,
           userId,
         },
         include: {
@@ -56,6 +60,7 @@ class PostController {
     const limit = Number(ctx.query.limit) || 10;
     const skip = (page - 1) * limit;
     const tab = ctx.query.tab as string; // 'recommend', 'follow', 'hot'
+    const type = ctx.query.type as string; // 'normal', 'lost_found', 'trade', 'confession'
     const userId = (ctx.state.user as { userId?: number })?.userId;
 
     try {
@@ -65,6 +70,10 @@ class PostController {
         createdAt: "desc",
       };
 
+      if (type) {
+        where.type = type;
+      }
+
       if (tab === "follow" && userId) {
         // Only posts from users I follow
         const following = await prisma.follow.findMany({
@@ -72,12 +81,9 @@ class PostController {
           select: { followingId: true },
         });
         const followingIds = following.map((f) => f.followingId);
-        where = { userId: { in: followingIds } };
+        where.userId = { in: followingIds };
       } else if (tab === "hot") {
-        // Sort by interactions count (not easy in Prisma directly without aggregate or raw)
-        // For simplicity, we stick to createdAt or maybe interaction count if we had it cached
-        // Let's keep it simple: just random or newest for now, optimizing 'hot' is a complexity.
-        // Actually, let's use some "recent" sort
+        // ... (sorting by interactions count logic if needed)
       }
 
       const posts = await prisma.post.findMany({
@@ -139,8 +145,22 @@ class PostController {
             where: { postId: post.id, type: "bookmark" },
           });
 
+          // Anonymity Logic
+          const displayUser = post.isAnonymous
+            ? {
+                id: 0,
+                username: "anonymous",
+                name: "匿名用户",
+                avatar: null,
+                school: null,
+                department: null,
+                isVerified: false,
+              }
+            : post.user;
+
           return {
             ...post,
+            user: displayUser,
             isLiked,
             isBookmarked,
             likes: likesCount,
@@ -256,8 +276,22 @@ class PostController {
         isLiked = !!like;
       }
 
+      // Anonymity Logic
+      const displayUser = post.isAnonymous
+        ? {
+            id: 0,
+            username: "anonymous",
+            name: "匿名用户",
+            avatar: null,
+            school: null,
+            department: null,
+            isVerified: false,
+          }
+        : post.user;
+
       ctx.body = {
         ...post,
+        user: displayUser,
         likes: likesCount,
         comments: commentsCount,
         isLiked,
