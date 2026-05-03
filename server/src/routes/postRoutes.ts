@@ -6,6 +6,7 @@ const router = new Router();
 
 router.post("/", authMiddleware, postController.create);
 router.get("/", authMiddleware, postController.getAll); // Auth for personalized feed
+router.get("/random-paper-plane", authMiddleware, postController.getRandomPaperPlane);
 router.get("/search", authMiddleware, postController.search); // Search posts and users
 router.get("/:id", authMiddleware, postController.getById); // Get post details
 router.post("/:id/interact", authMiddleware, postController.interact);
