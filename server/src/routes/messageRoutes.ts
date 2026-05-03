@@ -9,6 +9,8 @@ router.get(
   authMiddleware,
   messageController.getConversations
 );
+router.get("/public", authMiddleware, messageController.getPublicMessages);
+router.get("/club/:clubId", authMiddleware, messageController.getGroupMessages);
 router.get("/:contactId", authMiddleware, messageController.getMessages);
 router.post("/:contactId/read", authMiddleware, messageController.markAsRead);
 router.post("/", authMiddleware, messageController.sendMessage);

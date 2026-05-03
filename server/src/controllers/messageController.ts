@@ -155,34 +155,120 @@ class MessageController {
   // Send a message
   async sendMessage(ctx: Context) {
     const userId = (ctx.state as AuthState).user.userId;
-    const { receiverId, content } = ctx.request.body as {
-      receiverId: string | number;
+    const { receiverId, clubId, isPublic, content } = ctx.request.body as {
+      receiverId?: string | number;
+      clubId?: string | number;
+      isPublic?: boolean;
       content: string;
     };
 
-    if (!receiverId || !content) {
+    if (!content) {
       ctx.status = 400;
-      ctx.body = { error: "receiverId and content are required" };
+      ctx.body = { error: "content is required" };
+      return;
+    }
+
+    if (!receiverId && !clubId && !isPublic) {
+      ctx.status = 400;
+      ctx.body = { error: "receiverId, clubId, or isPublic is required" };
       return;
     }
 
     try {
+      const messageData: any = {
+        senderId: userId,
+        content,
+        isPublic: !!isPublic,
+      };
+
+      if (receiverId) messageData.receiverId = Number(receiverId);
+      if (clubId) messageData.clubId = Number(clubId);
+
       const message = await prisma.message.create({
-        data: {
-          senderId: userId,
-          receiverId: Number(receiverId),
-          content,
+        data: messageData,
+        include: {
+          sender: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatar: true,
+            },
+          },
         },
       });
 
-      // Emit to receiver's room
+      // Socket.io emission logic
       const io = (ctx as Context & { io: Server }).io;
       if (io) {
-        io.to(`user_${receiverId}`).emit("receive_message", message);
+        if (receiverId) {
+          io.to(`user_${receiverId}`).emit("receive_message", message);
+        } else if (clubId) {
+          io.to(`club_${clubId}`).emit("receive_message", message);
+        } else if (isPublic) {
+          io.to("public_room").emit("receive_message", message);
+        }
       }
 
       ctx.status = 201;
       ctx.body = message;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: (error as Error).message };
+    }
+  }
+
+  // Get messages for a club (group chat)
+  async getGroupMessages(ctx: Context) {
+    const { clubId } = ctx.params;
+
+    try {
+      const messages = await prisma.message.findMany({
+        where: {
+          clubId: Number(clubId),
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatar: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+      });
+
+      ctx.body = messages;
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: (error as Error).message };
+    }
+  }
+
+  // Get public messages
+  async getPublicMessages(ctx: Context) {
+    try {
+      const messages = await prisma.message.findMany({
+        where: {
+          isPublic: true,
+        },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              avatar: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+        take: 100, // Limit to recent 100 public messages
+      });
+
+      ctx.body = messages;
     } catch (error) {
       ctx.status = 500;
       ctx.body = { error: (error as Error).message };

@@ -47,6 +47,16 @@ io.on("connection", (socket) => {
     socket.join(`user_${socket.data.user.id}`);
   }
 
+  socket.on("join_room", (roomId: string) => {
+    socket.join(roomId);
+    console.log(`User ${socket.data.user?.id} joined room: ${roomId}`);
+  });
+
+  socket.on("leave_room", (roomId: string) => {
+    socket.leave(roomId);
+    console.log(`User ${socket.data.user?.id} left room: ${roomId}`);
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
