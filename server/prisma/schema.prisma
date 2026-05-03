@@ -28,6 +28,7 @@ model User {
   followedBy   Follow[]      @relation("followedBy")
   following    Follow[]      @relation("following")
   clubs       Club[]   @relation("OwnedClubs")
+  events      Event[]
 
   @@map("users")
 }
@@ -67,8 +68,26 @@ model Club {
   createdAt   DateTime @default(now()) @map("created_at")
   
   owner       User     @relation("OwnedClubs", fields: [ownerId], references: [id])
+  events      Event[]
 
   @@map("clubs")
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  image       String?  @db.Text
+  date        String   // Plain text: "Next Friday"
+  location    String   // Plain text: "Library"
+  description String?  @db.Text
+  clubId      Int      @map("club_id")
+  ownerId     Int      @map("owner_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  club        Club     @relation(fields: [clubId], references: [id])
+  owner       User     @relation(fields: [ownerId], references: [id])
+
+  @@map("events")
 }
 
 model Message {
