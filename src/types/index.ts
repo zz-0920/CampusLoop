@@ -52,3 +52,14 @@ export interface AuthResponse {
 export interface ApiError {
   error: string;
 }
+
+export interface Event {
+  id: number;
+  title: string;
+  date: string;
+  location: string;
+  description?: string;
+  image?: string;
+  clubId: number;
+  club?: Club;
+}

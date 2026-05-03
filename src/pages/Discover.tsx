@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Send, ChevronRight, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { mockEvents } from "../data/mockData";
 import { getDiscoverUsers, getClubs } from "../services/discoverService";
-import type { User, Club } from "../types";
+import { getEvents } from "../services/eventService";
+import type { User, Club, Event } from "../types";
 
 const Discover: React.FC = () => {
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState<User[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,12 +18,14 @@ const Discover: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [usersData, clubsData] = await Promise.all([
+      const [usersData, clubsData, eventsData] = await Promise.all([
         getDiscoverUsers(),
         getClubs(),
+        getEvents(),
       ]);
       setCandidates(usersData as unknown as User[]);
       setClubs(clubsData as unknown as Club[]);
+      setEvents(eventsData as unknown as Event[]);
     } catch (error) {
       console.error("Failed to load discover data", error);
     } finally {
@@ -145,35 +148,55 @@ const Discover: React.FC = () => {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">活动预告</h2>
-            <button className="text-black text-xs font-bold">更多</button>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate("/events/create")}
+                className="text-black text-xs font-bold flex items-center gap-1"
+              >
+                <Plus size={14} /> 发起活动
+              </button>
+              <button className="text-black text-xs font-bold">更多</button>
+            </div>
           </div>
           <div className="space-y-8">
-            {mockEvents.map((event) => (
-              <div
-                key={event.id}
-                className="flex flex-col gap-4 border-b border-gray-50 pb-8 last:border-0"
-              >
-                <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 left-4 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-sm">
-                    {event.date}
+            {events.length > 0 ? (
+              events.map((event) => (
+                <div
+                  key={event.id}
+                  className="flex flex-col gap-4 border-b border-gray-50 pb-8 last:border-0"
+                >
+                  <div className="relative aspect-video w-full overflow-hidden bg-gray-50 border border-gray-100">
+                    {event.image ? (
+                      <img
+                        src={event.image}
+                        alt={event.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-200 font-bold text-xl bg-gray-50">
+                        {event.title.charAt(0)}
+                      </div>
+                    )}
+                    <div className="absolute top-4 left-4 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                      {event.date}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-lg text-black mb-1">
+                      {event.title}
+                    </h4>
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-tighter">
+                      @ {event.location}
+                    </p>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-lg text-black mb-1">
-                    {event.title}
-                  </h4>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-tighter">
-                    @ {event.location}
-                  </p>
-                </div>
+              ))
+            ) : (
+              <div className="py-10 text-center bg-gray-50 text-gray-400 text-sm italic">
+                暂无活动预告
               </div>
-            ))}
+            )}
           </div>
         </section>
 
