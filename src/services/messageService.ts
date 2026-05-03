@@ -8,8 +8,18 @@ export const getMessages = async (contactId: number) => {
   return request.get(`/messages/${contactId}`);
 };
 
+export const getPublicMessages = async () => {
+  return request.get("/messages/public");
+};
+
+export const getClubMessages = async (clubId: number) => {
+  return request.get(`/messages/club/${clubId}`);
+};
+
 export const sendMessage = async (data: {
-  receiverId: number;
+  receiverId?: number;
+  clubId?: number;
+  isPublic?: boolean;
   content: string;
 }) => {
   return request.post("/messages", data);

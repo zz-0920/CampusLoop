@@ -25,7 +25,9 @@ export interface UploadResponse {
 export interface Message {
   id: number;
   senderId: number;
-  receiverId: number;
+  receiverId?: number;
+  clubId?: number;
+  isPublic?: boolean;
   content: string;
   isRead: boolean;
   createdAt: string;

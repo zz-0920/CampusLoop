@@ -21,6 +21,7 @@ const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const FollowList = React.lazy(() => import("./pages/FollowList"));
 const SearchResults = React.lazy(() => import("./pages/SearchResults"));
 const ChatDetail = React.lazy(() => import("./pages/Chat/ChatDetail"));
+const GroupChatDetail = React.lazy(() => import("./pages/Chat/GroupChatDetail"));
 const CreateClub = React.lazy(() => import("./pages/Club/CreateClub"));
 const CreateEvent = React.lazy(() => import("./pages/Event/CreateEvent"));
 const CategoryPosts = React.lazy(() => import("./pages/Post/CategoryPosts"));
@@ -101,6 +102,8 @@ function App() {
             <Route path="/publish" element={<Publish />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/chat/:contactId" element={<ChatDetail />} />
+            <Route path="/chat/public" element={<GroupChatDetail />} />
+            <Route path="/chat/club/:clubId" element={<GroupChatDetail />} />
             <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/user/:id" element={<UserProfile />} />
             <Route path="/user/:id/followers" element={<FollowList />} />
