@@ -22,6 +22,7 @@ const FollowList = React.lazy(() => import("./pages/FollowList"));
 const SearchResults = React.lazy(() => import("./pages/SearchResults"));
 const ChatDetail = React.lazy(() => import("./pages/Chat/ChatDetail"));
 const CreateClub = React.lazy(() => import("./pages/Club/CreateClub"));
+const CreateEvent = React.lazy(() => import("./pages/Event/CreateEvent"));
 
 // Page loading spinner component
 const PageLoadingSpinner = () => (
@@ -41,13 +42,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isUserProfilePage = location.pathname.startsWith("/user/");
   const isSearchPage = location.pathname === "/search";
   const isClubCreatePage = location.pathname === "/clubs/create";
+  const isEventCreatePage = location.pathname === "/events/create";
   const hideBottomNav =
     isAuthPage ||
     isChatPage ||
     isPostDetailPage ||
     isUserProfilePage ||
     isSearchPage ||
-    isClubCreatePage;
+    isClubCreatePage ||
+    isEventCreatePage;
 
   // Scroll to top on route change
   React.useEffect(() => {
@@ -103,6 +106,7 @@ function App() {
             <Route path="/user/:id/following" element={<FollowList />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/clubs/create" element={<CreateClub />} />
+            <Route path="/events/create" element={<CreateEvent />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </Layout>
