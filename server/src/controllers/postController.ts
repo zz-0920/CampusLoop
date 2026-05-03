@@ -65,7 +65,7 @@ class PostController {
 
     try {
       // Basic query options
-      let where: Prisma.PostWhereInput = {};
+      const where: Prisma.PostWhereInput = {};
       const orderBy: Prisma.PostOrderByWithRelationInput = {
         createdAt: "desc",
       };
