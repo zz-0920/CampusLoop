@@ -33,7 +33,9 @@ describe("EventController", () => {
         clubId: 1
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(prisma.club.findFirst).mockResolvedValue({ id: 1, ownerId: 1 } as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       vi.mocked(prisma.event.create).mockResolvedValue({ id: 1, ...eventData, ownerId: 1 } as any);
 
       const response = await request(app.callback())

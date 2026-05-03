@@ -3,7 +3,14 @@ import prisma from "../utils/prisma.js";
 
 class EventController {
   async create(ctx: Context) {
-    const { title, date, location, description, image, clubId } = ctx.request.body as any;
+    const { title, date, location, description, image, clubId } = ctx.request.body as {
+      title: string;
+      date: string;
+      location: string;
+      description?: string;
+      image?: string;
+      clubId: number | string;
+    };
     const userId = (ctx.state.user as { userId: number }).userId;
 
     if (!title || !date || !location || !clubId) {
