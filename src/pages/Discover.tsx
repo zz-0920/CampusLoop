@@ -205,15 +205,15 @@ const Discover: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400">校园工具箱</h2>
           </div>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {[
-              { name: "失物招领", icon: "🔍" },
-              { name: "二手交易", icon: "🛒" },
-              { name: "表白墙", icon: "💌" },
-              { name: "课程表", icon: "📅" },
+              { name: "失物招领", icon: "🔍", type: "lost_found" },
+              { name: "二手交易", icon: "🛒", type: "trade" },
+              { name: "表白墙", icon: "💌", type: "confession" },
             ].map((tool) => (
               <button
                 key={tool.name}
+                onClick={() => navigate(`/posts/category/${tool.type}`)}
                 className="flex flex-col items-center gap-3 active:scale-95 transition-transform"
               >
                 <div className="w-full aspect-square bg-gray-50 border border-gray-50 flex items-center justify-center text-xl">

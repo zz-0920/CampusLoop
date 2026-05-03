@@ -9,15 +9,19 @@ import {
   Globe,
   Plus,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { createPost, uploadImage } from "../services/postService";
 
 const MAX_IMAGES = 9;
 
 const Publish: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialType = queryParams.get("type") || "normal";
+
   const [content, setContent] = useState("");
-  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(initialType === "confession");
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -76,8 +80,14 @@ const Publish: React.FC = () => {
         content,
         // Store multiple images as comma-separated string or first image
         image: images.length > 0 ? images.join(",") : undefined,
+        type: initialType,
+        isAnonymous: isAnonymous,
       });
-      navigate("/");
+      if (initialType !== "normal") {
+        navigate(`/posts/category/${initialType}`);
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Failed to publish post", error);
       alert("发布失败，请重试");
