@@ -20,24 +20,30 @@ interface Message {
   };
 }
 
-interface User {
-  id: number;
-  username: string;
-  name?: string;
-  avatar?: string;
-}
-
 const GroupChatDetail: React.FC = () => {
   const { clubId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
+  
+  const isPublic = location.pathname === "/chat/public";
+
   const [roomInfo, setRoomInfo] = useState<{ name: string; avatar?: string }>({
     name: isPublic ? "全校公共聊天室" : "加载中..."
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { socket } = useSocket();
+
+  // Read user from localStorage
+  const currentUser = React.useMemo(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  }, []);
+
+  const scrollToBottom = React.useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   // Fetch room info (Club details)
   useEffect(() => {
