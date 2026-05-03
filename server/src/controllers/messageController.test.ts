@@ -11,7 +11,9 @@ vi.mock("../utils/prisma.js", () => ({
 }));
 
 describe("MessageController.sendMessage", () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockIo: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockCtx: any;
 
   beforeEach(() => {
@@ -32,6 +34,7 @@ describe("MessageController.sendMessage", () => {
   it("should emit receive_message to club room when clubId is provided", async () => {
     mockCtx.request.body = { clubId: 10, content: "Hello club" };
     const mockMessage = { id: 1, content: "Hello club", senderId: 1, clubId: 10 };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(prisma.message.create).mockResolvedValue(mockMessage as any);
 
     await messageController.sendMessage(mockCtx);
@@ -43,6 +46,7 @@ describe("MessageController.sendMessage", () => {
   it("should emit receive_message to public_room when isPublic is true", async () => {
     mockCtx.request.body = { isPublic: true, content: "Hello public" };
     const mockMessage = { id: 2, content: "Hello public", senderId: 1, isPublic: true };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(prisma.message.create).mockResolvedValue(mockMessage as any);
 
     await messageController.sendMessage(mockCtx);

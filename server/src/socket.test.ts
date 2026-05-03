@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, beforeAll, afterAll } from "vitest";
 import { io as ioc, type Socket as ClientSocket } from "socket.io-client";
 import { httpServer, app } from "./app.js";
 import jwt from "jsonwebtoken";

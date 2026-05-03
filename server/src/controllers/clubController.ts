@@ -35,6 +35,24 @@ class ClubController {
       ctx.body = { error: "Failed to create club" };
     }
   }
+
+  async getById(ctx: Context) {
+    const { id } = ctx.params;
+    try {
+      const club = await prisma.club.findUnique({
+        where: { id: Number(id) }
+      });
+      if (!club) {
+        ctx.status = 404;
+        ctx.body = { error: "Club not found" };
+        return;
+      }
+      ctx.body = club;
+    } catch {
+      ctx.status = 500;
+      ctx.body = { error: "Failed to fetch club" };
+    }
+  }
 }
 
 export default new ClubController();

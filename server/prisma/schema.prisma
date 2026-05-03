@@ -71,6 +71,7 @@ model Club {
   
   owner       User     @relation("OwnedClubs", fields: [ownerId], references: [id])
   events      Event[]
+  messages    Message[]
 
   @@map("clubs")
 }
@@ -95,12 +96,15 @@ model Event {
 model Message {
   id          Int      @id @default(autoincrement())
   senderId    Int      @map("sender_id")
-  receiverId  Int      @map("receiver_id")
+  receiverId  Int?     @map("receiver_id")
+  clubId      Int?     @map("club_id")
   content     String   @db.Text
   isRead      Boolean  @default(false) @map("is_read")
+  isPublic    Boolean  @default(false) @map("is_public")
   createdAt   DateTime @default(now()) @map("created_at")
   sender      User     @relation("SentMessages", fields: [senderId], references: [id])
-  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiver    User?    @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  club        Club?    @relation(fields: [clubId], references: [id])
 
   @@map("messages")
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Send, ChevronRight, Plus } from "lucide-react";
+import { Send, ChevronRight, Plus, MessageCircle, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getDiscoverUsers, getClubs } from "../services/discoverService";
 import { getEvents } from "../services/eventService";
@@ -93,19 +93,38 @@ const Discover: React.FC = () => {
           )}
         </section>
 
-        {/* 2. Campus Paper Plane */}
-        <section>
-          <div className="bg-black p-6 text-white flex items-center justify-between">
+        {/* 2. Communication */}
+        <section className="flex flex-col gap-4">
+          {/* Campus Paper Plane */}
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 text-black flex items-center justify-between shadow-sm">
             <div>
               <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
                 <Send size={20} /> 校园纸飞机
               </h3>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-gray-500">
                 匿名分享你的心情
               </p>
             </div>
-            <button className="bg-white text-black px-5 py-2 rounded-full text-xs font-bold active:scale-95 transition-transform">
+            <button className="bg-black text-white px-5 py-2 rounded-full text-xs font-bold active:scale-95 transition-transform">
               去投递
+            </button>
+          </div>
+
+          {/* Public Square */}
+          <div 
+            onClick={() => navigate("/chat/public")}
+            className="bg-white border border-gray-100 rounded-2xl p-6 text-black flex items-center justify-between shadow-sm cursor-pointer active:scale-[0.98] transition-transform"
+          >
+            <div>
+              <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
+                <MessageSquare size={20} /> 公共广场
+              </h3>
+              <p className="text-xs text-gray-500">
+                全校共享聊天室
+              </p>
+            </div>
+            <button className="bg-black text-white px-5 py-2 rounded-full text-xs font-bold">
+              进入
             </button>
           </div>
         </section>
@@ -121,18 +140,30 @@ const Discover: React.FC = () => {
               clubs.map((club) => (
                 <div
                   key={club.id}
-                  className="shrink-0 w-36 flex flex-col cursor-pointer"
+                  onClick={() => navigate(`/chat/club/${club.id}`)}
+                  className="shrink-0 w-36 flex flex-col cursor-pointer group"
                 >
                   <div className="aspect-square bg-gray-50 border border-gray-100 flex items-center justify-center mb-3 overflow-hidden">
                     {club.logo ? (
-                      <img src={club.logo} alt={club.name} className="w-full h-full object-cover" />
+                      <img src={club.logo} alt={club.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                     ) : (
                       <span className="text-2xl font-bold text-gray-200">{club.name.charAt(0)}</span>
                     )}
                   </div>
-                  <span className="text-sm font-bold text-black truncate mb-0.5">
-                    {club.name}
-                  </span>
+                  <div className="flex justify-between items-start mb-0.5">
+                    <span className="text-sm font-bold text-black truncate flex-1">
+                      {club.name}
+                    </span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/chat/club/${club.id}`);
+                      }}
+                      className="text-gray-400 hover:text-black p-1 -mt-1 -mr-1 shrink-0 transition-colors"
+                    >
+                      <MessageCircle size={14} />
+                    </button>
+                  </div>
                   <span className="text-[10px] font-bold text-gray-400 uppercase">
                     {club.memberCount} MEMBERS
                   </span>

@@ -175,17 +175,14 @@ class MessageController {
     }
 
     try {
-      const messageData: any = {
-        senderId: userId,
-        content,
-        isPublic: !!isPublic,
-      };
-
-      if (receiverId) messageData.receiverId = Number(receiverId);
-      if (clubId) messageData.clubId = Number(clubId);
-
       const message = await prisma.message.create({
-        data: messageData,
+        data: {
+          content,
+          isPublic: !!isPublic,
+          sender: { connect: { id: userId } },
+          ...(receiverId && { receiver: { connect: { id: Number(receiverId) } } }),
+          ...(clubId && { club: { connect: { id: Number(clubId) } } }),
+        },
         include: {
           sender: {
             select: {
