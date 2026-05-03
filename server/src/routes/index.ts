@@ -7,6 +7,7 @@ import messageRoutes from "./messageRoutes.js";
 import uploadRoutes from "./uploadRoutes.js";
 import interactionRoutes from "./interactionRoutes.js";
 import clubRoutes from "./clubRoutes.js";
+import eventRoutes from "./eventRoutes.js";
 
 const router = new Router();
 
@@ -23,12 +24,9 @@ router.use(
   discoverRoutes.allowedMethods()
 ); // /api/discover
 router.use("/messages", messageRoutes.routes(), messageRoutes.allowedMethods()); // /api/messages
-router.use(
-  "/interactions",
-  interactionRoutes.routes(),
-  interactionRoutes.allowedMethods()
-); // /api/interactions
+router.use("/interactions", interactionRoutes.routes(), interactionRoutes.allowedMethods()); // /api/interactions
 router.use("/clubs", clubRoutes.routes(), clubRoutes.allowedMethods()); // /api/clubs
+router.use("/events", eventRoutes.routes(), eventRoutes.allowedMethods()); // /api/events
 router.use(uploadRoutes.routes(), uploadRoutes.allowedMethods()); // /api/upload
 
 export default router;

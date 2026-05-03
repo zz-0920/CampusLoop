@@ -366,6 +366,23 @@ class UserController {
       };
     }
   }
+
+  // Get clubs owned by current user
+  async getOwnedClubs(ctx: Context) {
+    const userId = (ctx.state.user as { userId: number }).userId;
+    try {
+      const clubs = await prisma.club.findMany({
+        where: { ownerId: userId },
+        select: { id: true, name: true, logo: true },
+      });
+      ctx.body = clubs;
+    } catch (error: unknown) {
+      ctx.status = 500;
+      ctx.body = {
+        error: error instanceof Error ? error.message : "Failed to fetch owned clubs",
+      };
+    }
+  }
 }
 
 export default new UserController();
