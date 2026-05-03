@@ -23,6 +23,7 @@ const SearchResults = React.lazy(() => import("./pages/SearchResults"));
 const ChatDetail = React.lazy(() => import("./pages/Chat/ChatDetail"));
 const CreateClub = React.lazy(() => import("./pages/Club/CreateClub"));
 const CreateEvent = React.lazy(() => import("./pages/Event/CreateEvent"));
+const CategoryPosts = React.lazy(() => import("./pages/Post/CategoryPosts"));
 
 // Page loading spinner component
 const PageLoadingSpinner = () => (
@@ -107,6 +108,7 @@ function App() {
             <Route path="/search" element={<SearchResults />} />
             <Route path="/clubs/create" element={<CreateClub />} />
             <Route path="/events/create" element={<CreateEvent />} />
+            <Route path="/posts/category/:type" element={<CategoryPosts />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </Layout>

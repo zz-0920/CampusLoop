@@ -40,6 +40,7 @@ export const getPosts = async (params: {
   page?: number;
   limit?: number;
   tab?: string;
+  type?: string;
 }) => {
   return request.get("/posts", { params });
 };
@@ -77,7 +78,12 @@ export const searchPosts = async (
   }) as unknown as Promise<SearchResult>;
 };
 
-export const createPost = async (data: { content: string; image?: string }) => {
+export const createPost = async (data: {
+  content: string;
+  image?: string;
+  type?: string;
+  isAnonymous?: boolean;
+}) => {
   return request.post("/posts", data);
 };
 
