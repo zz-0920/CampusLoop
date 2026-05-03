@@ -508,6 +508,48 @@ class PostController {
       };
     }
   }
+
+  // Catch a random paper plane
+  async getRandomPaperPlane(ctx: Context) {
+    const userId = (ctx.state.user as { userId: number }).userId;
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    try {
+      // Fetch eligible post IDs first to randomize efficiently
+      const eligiblePosts = await prisma.post.findMany({
+        where: {
+          type: "paper_plane",
+          userId: { not: userId },
+          createdAt: { gte: twentyFourHoursAgo },
+        },
+        select: { id: true },
+      });
+
+      if (eligiblePosts.length === 0) {
+        ctx.body = null;
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * eligiblePosts.length);
+      const randomId = eligiblePosts[randomIndex].id;
+
+      const post = await prisma.post.findUnique({
+        where: { id: randomId },
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+        },
+      });
+
+      ctx.body = post;
+    } catch (error: unknown) {
+      ctx.status = 500;
+      ctx.body = {
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
 }
 
 export default new PostController();
