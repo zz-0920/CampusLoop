@@ -105,7 +105,10 @@ const Discover: React.FC = () => {
                 匿名分享你的心情
               </p>
             </div>
-            <button className="bg-black text-white px-5 py-2 rounded-full text-xs font-bold active:scale-95 transition-transform">
+            <button 
+              onClick={() => navigate("/toolbox/paper-plane")}
+              className="bg-black text-white px-5 py-2 rounded-full text-xs font-bold active:scale-95 transition-transform"
+            >
               去投递
             </button>
           </div>
