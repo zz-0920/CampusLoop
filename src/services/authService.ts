@@ -23,3 +23,7 @@ export const register = async (data: RegisterData) => {
 export const getProfile = async () => {
   return request.get("/user/profile");
 };
+
+export const changePassword = async (data: { oldPassword?: string; newPassword?: string }) => {
+  return request.post("/auth/change-password", data);
+};

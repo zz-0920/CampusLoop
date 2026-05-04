@@ -28,6 +28,11 @@ const CategoryPosts = React.lazy(() => import("./pages/Post/CategoryPosts"));
 const PaperPlane = React.lazy(() => import("./pages/Toolbox/PaperPlane"));
 const Settings = React.lazy(() => import("./pages/Settings"));
 const ProfileSettings = React.lazy(() => import("./pages/Settings/ProfileSettings"));
+const AccountSettings = React.lazy(() => import("./pages/Settings/AccountSettings"));
+const NotificationSettings = React.lazy(() => import("./pages/Settings/NotificationSettings"));
+const PrivacySettings = React.lazy(() => import("./pages/Settings/PrivacySettings"));
+const HelpSettings = React.lazy(() => import("./pages/Settings/HelpSettings"));
+const AboutSettings = React.lazy(() => import("./pages/Settings/AboutSettings"));
 
 // Page loading spinner component
 const PageLoadingSpinner = () => (
@@ -49,7 +54,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isClubCreatePage = location.pathname === "/clubs/create";
   const isEventCreatePage = location.pathname === "/events/create";
   const isPaperPlanePage = location.pathname === "/toolbox/paper-plane";
-  const isSettingsPage = location.pathname === "/settings";
+  const isSettingsPage = location.pathname.startsWith("/settings");
   const hideBottomNav =
     isAuthPage ||
     isChatPage ||
@@ -122,6 +127,11 @@ function App() {
             <Route path="/toolbox/paper-plane" element={<PaperPlane />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
+            <Route path="/settings/account" element={<AccountSettings />} />
+            <Route path="/settings/notifications" element={<NotificationSettings />} />
+            <Route path="/settings/privacy" element={<PrivacySettings />} />
+            <Route path="/settings/help" element={<HelpSettings />} />
+            <Route path="/settings/about" element={<AboutSettings />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </Layout>

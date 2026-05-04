@@ -158,6 +158,49 @@ class AuthController {
       };
     }
   }
+
+  async changePassword(ctx: Context) {
+    const userId = (ctx.state.user as JwtPayload).userId;
+    const { oldPassword, newPassword } = ctx.request.body as {
+      oldPassword?: string;
+      newPassword?: string;
+    };
+
+    try {
+      if (!oldPassword || !newPassword) {
+        ctx.status = 400;
+        ctx.body = { error: "Missing required fields" };
+        return;
+      }
+
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        ctx.status = 404;
+        ctx.body = { error: "User not found" };
+        return;
+      }
+
+      const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+      if (!isPasswordValid) {
+        ctx.status = 400;
+        ctx.body = { error: "Current password is incorrect" };
+        return;
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+      await prisma.user.update({
+        where: { id: userId },
+        data: { password: hashedNewPassword },
+      });
+
+      ctx.body = { message: "Password changed successfully" };
+    } catch (error: unknown) {
+      ctx.status = 500;
+      ctx.body = {
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
 }
 
 export default new AuthController();
