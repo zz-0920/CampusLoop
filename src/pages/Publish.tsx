@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPost, uploadImage } from "../services/postService";
+import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 
 declare global {
   interface Window { AMap: any; _AMapSecurityConfig: any; }
