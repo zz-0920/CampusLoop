@@ -117,7 +117,10 @@ const Profile: React.FC = () => {
               </p>
             </div>
           </div>
-          <button className="p-4 border border-gray-100 rounded-2xl text-black bg-white">
+          <button 
+            onClick={() => navigate("/settings")}
+            className="p-4 border border-gray-100 rounded-2xl text-black bg-white hover:bg-gray-50 active:scale-95 transition-all"
+          >
             <Settings size={24} />
           </button>
         </div>
