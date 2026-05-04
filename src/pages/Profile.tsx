@@ -10,14 +10,18 @@ import {
   HelpCircle,
   LogOut,
 } from "lucide-react";
-import { getUserProfile } from "../services/userService";
+import { getUserProfile, updateProfile } from "../services/userService";
 import type { User } from "../types";
 import Avatar from "../components/Avatar";
+import { Edit2, Check, X } from "lucide-react";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [bioText, setBioText] = useState("");
+  const [savingBio, setSavingBio] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -25,8 +29,9 @@ const Profile: React.FC = () => {
 
   const loadUser = async () => {
     try {
-      const data = await getUserProfile();
-      setUser(data as unknown as User);
+      const data = await getUserProfile() as unknown as User;
+      setUser(data);
+      setBioText(data.bio || "");
     } catch (error) {
       console.error("Failed to load user", error);
       // Fallback to local storage if API fails or token logic
@@ -41,6 +46,21 @@ const Profile: React.FC = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const handleBioSave = async () => {
+    if (!user) return;
+    setSavingBio(true);
+    try {
+      await updateProfile({ bio: bioText });
+      setUser({ ...user, bio: bioText });
+      setIsEditingBio(false);
+    } catch (error) {
+      console.error("Failed to update bio", error);
+      alert("更新签名失败");
+    } finally {
+      setSavingBio(false);
+    }
   };
 
   if (loading)
@@ -126,10 +146,51 @@ const Profile: React.FC = () => {
         </div>
 
         {/* Bio Card */}
-        <div className="p-4 border border-gray-100 rounded-2xl mb-8 bg-white">
-          <p className="text-sm text-gray-700 italic leading-relaxed">
-            "{user.bio || "追求卓越，成功就会在不经意间追上你。"}"
-          </p>
+        <div className="group relative">
+          {!isEditingBio ? (
+            <div 
+              onClick={() => setIsEditingBio(true)}
+              className="p-4 border border-gray-100 rounded-2xl mb-8 bg-white cursor-pointer hover:border-black/10 transition-colors"
+            >
+              <p className="text-sm text-gray-700 italic leading-relaxed pr-6">
+                {user.bio || "追求卓越，成功就会在不经意间追上你。"}
+              </p>
+              <Edit2 size={14} className="absolute top-4 right-4 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          ) : (
+            <div className="p-4 border border-black rounded-2xl mb-8 bg-white shadow-sm transition-all">
+              <textarea
+                autoFocus
+                value={bioText}
+                onChange={(e) => setBioText(e.target.value)}
+                className="w-full text-sm text-gray-700 italic leading-relaxed bg-transparent border-none focus:ring-0 resize-none p-0"
+                rows={2}
+                placeholder="介绍一下你自己..."
+              />
+              <div className="flex justify-end gap-2 mt-2">
+                <button 
+                  onClick={() => {
+                    setIsEditingBio(false);
+                    setBioText(user.bio || "");
+                  }}
+                  className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+                <button 
+                  onClick={handleBioSave}
+                  disabled={savingBio}
+                  className="p-1.5 rounded-full bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
+                >
+                  {savingBio ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Check size={16} />
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* 2. Stats Grid */}
