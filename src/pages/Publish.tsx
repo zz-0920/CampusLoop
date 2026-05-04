@@ -103,6 +103,29 @@ const Publish: React.FC = () => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    if (!textareaRef.current) return;
+
+    const { selectionStart, selectionEnd } = textareaRef.current;
+    const emoji = emojiData.emoji;
+    const newContent =
+      content.substring(0, selectionStart) +
+      emoji +
+      content.substring(selectionEnd);
+
+    setContent(newContent);
+    setShowEmojiPicker(false);
+
+    // Restore focus and cursor position
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        const newCursorPos = selectionStart + emoji.length;
+        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 0);
+  };
+
   const handlePublish = async () => {
     if ((!content.trim() && images.length === 0) || loading || uploading)
       return;
@@ -398,6 +421,25 @@ const Publish: React.FC = () => {
               >
                 <X size={14} className="text-blue-400" />
               </button>
+            </div>
+          )}
+
+          {/* Emoji Picker */}
+          {showEmojiPicker && (
+            <div
+              ref={emojiPickerRef}
+              className="absolute bottom-24 left-4 right-4 z-50 shadow-2xl rounded-2xl overflow-hidden border border-gray-100"
+            >
+              <EmojiPicker
+                onEmojiClick={onEmojiClick}
+                autoFocusSearch={false}
+                theme={Theme.LIGHT}
+                width="100%"
+                height={400}
+                searchPlaceHolder="搜索表情..."
+                previewConfig={{ showPreview: false }}
+                skinTonesDisabled
+              />
             </div>
           )}
 
