@@ -27,6 +27,7 @@ const CreateEvent = React.lazy(() => import("./pages/Event/CreateEvent"));
 const CategoryPosts = React.lazy(() => import("./pages/Post/CategoryPosts"));
 const PaperPlane = React.lazy(() => import("./pages/Toolbox/PaperPlane"));
 const Settings = React.lazy(() => import("./pages/Settings"));
+const ProfileSettings = React.lazy(() => import("./pages/Settings/ProfileSettings"));
 
 // Page loading spinner component
 const PageLoadingSpinner = () => (
@@ -120,6 +121,7 @@ function App() {
             <Route path="/posts/category/:type" element={<CategoryPosts />} />
             <Route path="/toolbox/paper-plane" element={<PaperPlane />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </Layout>

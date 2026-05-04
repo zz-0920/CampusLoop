@@ -383,6 +383,38 @@ class UserController {
       };
     }
   }
+
+  // Update user profile
+  async updateProfile(ctx: Context) {
+    const userId = (ctx.state.user as { userId: number }).userId;
+    const { name, bio, avatar, school, department } = ctx.request.body as {
+      name?: string;
+      bio?: string;
+      avatar?: string;
+      school?: string;
+      department?: string;
+    };
+
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          name,
+          bio,
+          avatar,
+          school,
+          department,
+        },
+      });
+
+      ctx.body = updatedUser;
+    } catch (error: unknown) {
+      ctx.status = 500;
+      ctx.body = {
+        error: error instanceof Error ? error.message : "Failed to update profile",
+      };
+    }
+  }
 }
 
 export default new UserController();

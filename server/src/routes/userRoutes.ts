@@ -7,6 +7,7 @@ const router = new Router();
 
 // Protected routes - current user
 router.get("/profile", authMiddleware, authController.getProfile);
+router.put("/profile", authMiddleware, userController.updateProfile);
 router.get("/owned-clubs", authMiddleware, userController.getOwnedClubs);
 
 // User by ID routes

@@ -69,7 +69,7 @@ const Settings: React.FC = () => {
                 <button
                   key={itemIdx}
                   className="w-full p-4 flex items-center gap-4 hover:bg-gray-50 active:bg-gray-100 transition-colors group border-b border-gray-50 last:border-0"
-                  onClick={() => console.log(`Navigate to ${item.path}`)}
+                  onClick={() => navigate(item.path)}
                 >
                   <div className="text-black opacity-70 group-hover:opacity-100">
                     {item.icon}

@@ -45,6 +45,16 @@ export const getUserProfile = async () => {
   return request.get("/user/profile");
 };
 
+export const updateProfile = async (data: {
+  name?: string;
+  bio?: string;
+  avatar?: string;
+  school?: string;
+  department?: string;
+}) => {
+  return request.put("/user/profile", data);
+};
+
 export const getUserById = async (id: number): Promise<UserProfile> => {
   return request.get(`/user/${id}`) as unknown as Promise<UserProfile>;
 };
