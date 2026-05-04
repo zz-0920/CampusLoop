@@ -68,11 +68,7 @@ const Messages: React.FC = () => {
     }
   }, [activeTab, loadConversations, loadInteractions]);
 
-  const groupChats = [
-    { id: "g1", name: "英语角交流群", icon: "🌍", online: 42 },
-    { id: "g2", name: "编程技术交流", icon: "💻", online: 128 },
-    { id: "g3", name: "摄影爱好者", icon: "📸", online: 56 },
-  ];
+
 
   const interactionTypes = [
     {
@@ -263,39 +259,6 @@ const Messages: React.FC = () => {
                 </div>
               ))}
             </div>
-
-            {/* Group Chats Section */}
-            <section className="p-4 border-b border-gray-50">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-sm font-bold text-gray-800">
-                  社团群聊 / 公共聊天室
-                </h3>
-                <span className="text-[10px] text-gray-400 underline cursor-pointer">
-                  管理
-                </span>
-              </div>
-              <div className="flex gap-4 overflow-x-auto no-scrollbar py-1">
-                {groupChats.map((group) => (
-                  <div
-                    key={group.id}
-                    className="shrink-0 w-24 flex flex-col items-center gap-2"
-                  >
-                    <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-gray-100 relative">
-                      {group.icon}
-                      <div className="absolute -top-1 -right-1 bg-green-500 w-3 h-3 rounded-full border-2 border-white"></div>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-[10px] text-gray-800 font-bold truncate w-20">
-                        {group.name}
-                      </p>
-                      <p className="text-[9px] text-gray-400">
-                        {group.online} 在线
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
 
             {/* Private Messages List */}
             <section className="p-2">

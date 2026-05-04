@@ -139,6 +139,7 @@ class AuthController {
               followedBy: true,
               following: true,
               interactions: true,
+              clubs: true,
             },
           },
         },

@@ -55,6 +55,10 @@ export const updateProfile = async (data: {
   return request.put("/user/profile", data);
 };
 
+export const getUserCollections = async () => {
+  return request.get("/user/collections");
+};
+
 export const getUserById = async (id: number): Promise<UserProfile> => {
   return request.get(`/user/${id}`) as unknown as Promise<UserProfile>;
 };

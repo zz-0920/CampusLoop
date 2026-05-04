@@ -373,13 +373,72 @@ class UserController {
     try {
       const clubs = await prisma.club.findMany({
         where: { ownerId: userId },
-        select: { id: true, name: true, logo: true },
+        select: { id: true, name: true, logo: true, memberCount: true },
       });
       ctx.body = clubs;
     } catch (error: unknown) {
       ctx.status = 500;
       ctx.body = {
         error: error instanceof Error ? error.message : "Failed to fetch owned clubs",
+      };
+    }
+  }
+
+  // Get posts bookmarked by current user
+  async getCollections(ctx: Context) {
+    const userId = (ctx.state.user as { userId: number }).userId;
+    try {
+      const interactions = await prisma.interaction.findMany({
+        where: {
+          userId,
+          type: "bookmark",
+        },
+        orderBy: { createdAt: "desc" },
+        include: {
+          post: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  avatar: true,
+                  school: true,
+                  department: true,
+                  isVerified: true,
+                },
+              },
+              _count: {
+                select: { interactions: true },
+              },
+            },
+          },
+        },
+      });
+
+      // Map to return posts with counts
+      const posts = await Promise.all(
+        interactions.map(async (i) => {
+          const post = i.post;
+          const likesCount = await prisma.interaction.count({
+            where: { postId: post.id, type: "like" },
+          });
+          const commentsCount = await prisma.interaction.count({
+            where: { postId: post.id, type: "comment" },
+          });
+          return {
+            ...post,
+            likes: likesCount,
+            comments: commentsCount,
+            isBookmarked: true,
+          };
+        })
+      );
+
+      ctx.body = posts;
+    } catch (error: unknown) {
+      ctx.status = 500;
+      ctx.body = {
+        error: error instanceof Error ? error.message : "Failed to fetch collections",
       };
     }
   }

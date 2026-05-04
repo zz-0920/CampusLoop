@@ -9,6 +9,7 @@ const router = new Router();
 router.get("/profile", authMiddleware, authController.getProfile);
 router.put("/profile", authMiddleware, userController.updateProfile);
 router.get("/owned-clubs", authMiddleware, userController.getOwnedClubs);
+router.get("/collections", authMiddleware, userController.getCollections);
 
 // User by ID routes
 router.get("/:id", authMiddleware, userController.getById);

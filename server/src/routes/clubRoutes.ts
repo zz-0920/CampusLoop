@@ -4,6 +4,7 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const router = new Router();
 
+router.get("/my", authMiddleware, clubController.getMyClubs);
 router.get("/:id", authMiddleware, clubController.getById);
 router.post("/", authMiddleware, clubController.create);
 

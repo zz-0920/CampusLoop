@@ -14,6 +14,11 @@ import { getUserProfile, updateProfile } from "../services/userService";
 import type { User } from "../types";
 import Avatar from "../components/Avatar";
 import { Edit2, Check, X } from "lucide-react";
+import {
+  checkAndUnlockBadges,
+  getDisplayBadges,
+  type DisplayBadge,
+} from "../services/badgeService";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
@@ -22,10 +27,36 @@ const Profile: React.FC = () => {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioText, setBioText] = useState("");
   const [savingBio, setSavingBio] = useState(false);
+  const [displayBadges, setDisplayBadges] = useState<DisplayBadge[]>([]);
+  const [newlyUnlocked, setNewlyUnlocked] = useState<
+    Array<{ id: number; name: string; icon: string }>
+  >([]);
 
   useEffect(() => {
     loadUser();
   }, []);
+
+  // Load badges after user is loaded
+  useEffect(() => {
+    if (!user) return;
+    const loadBadges = async () => {
+      try {
+        // Auto-check and unlock badges
+        const checkResult = await checkAndUnlockBadges();
+        if (checkResult.newlyUnlocked.length > 0) {
+          setNewlyUnlocked(checkResult.newlyUnlocked);
+          // Auto-dismiss after 3s
+          setTimeout(() => setNewlyUnlocked([]), 3000);
+        }
+        // Load display badges
+        const badges = await getDisplayBadges(user.id);
+        setDisplayBadges(badges);
+      } catch (error) {
+        console.error("Failed to load badges", error);
+      }
+    };
+    loadBadges();
+  }, [user?.id]);
 
   const loadUser = async () => {
     try {
@@ -88,35 +119,35 @@ const Profile: React.FC = () => {
       icon: <FileText size={20} className="text-black" />,
       label: "我的发布",
       count: user._count?.posts || 0,
+      path: "/my-posts",
     },
     {
       icon: <Bookmark size={20} className="text-black" />,
       label: "我的收藏",
       count: 0,
+      path: "/my-collections",
     },
     {
       icon: <Users size={20} className="text-black" />,
       label: "我的社团",
-      count: 0,
+      count: user._count?.clubs || 0,
+      path: "/my-clubs",
     },
     {
       icon: <Award size={20} className="text-black" />,
       label: "任务成就",
       count: null,
+      path: "/medals",
     },
     {
       icon: <HelpCircle size={20} className="text-black" />,
       label: "客户中心",
       count: null,
+      path: "/settings/help",
     },
   ];
 
-  const medals = [
-    { name: "早起达人", icon: "🌅" },
-    { name: "图书馆馆长", icon: "📚" },
-    { name: "社牛", icon: "🤝" },
-    { name: "代码之光", icon: "💻" },
-  ];
+
 
   return (
     <div className="min-h-screen bg-white pb-24 overflow-y-auto no-scrollbar">
@@ -196,12 +227,14 @@ const Profile: React.FC = () => {
         {/* 2. Stats Grid */}
         <div className="grid grid-cols-2 gap-3 mb-8">
           {stats.map((stat, idx) => {
-            const isClickable = stat.label === "粉丝" || stat.label === "关注";
+            const isClickable = stat.label === "粉丝" || stat.label === "关注" || stat.label === "帖子";
             const handleClick = () => {
               if (stat.label === "粉丝") {
                 navigate(`/user/${user.id}/followers`);
               } else if (stat.label === "关注") {
                 navigate(`/user/${user.id}/following`);
+              } else if (stat.label === "帖子") {
+                navigate("/my-posts");
               }
             };
             return (
@@ -224,6 +257,19 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
+      {/* Newly Unlocked Toast */}
+      {newlyUnlocked.length > 0 && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-bounce">
+          <div className="bg-black text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+            <span className="text-xl">{newlyUnlocked[0].icon}</span>
+            <div>
+              <p className="text-xs text-gray-300">恭喜解锁新勋章!</p>
+              <p className="text-sm font-bold">{newlyUnlocked[0].name}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 3. Medal Wall */}
       <section className="px-4 mb-8">
         <div className="flex items-center justify-between mb-4 px-1">
@@ -231,24 +277,35 @@ const Profile: React.FC = () => {
             <Award size={20} className="text-black" />
             勋章墙
           </h3>
-          <button className="text-xs text-gray-500 border border-gray-100 px-3 py-1.5 rounded-full transition-colors">
+          <button
+            onClick={() => navigate("/medals")}
+            className="text-xs text-gray-500 border border-gray-100 px-3 py-1.5 rounded-full transition-colors hover:bg-gray-50 active:scale-95"
+          >
             查看更多
           </button>
         </div>
         <div className="flex gap-4 overflow-x-auto no-scrollbar py-2">
-          {medals.map((medal, idx) => (
-            <div
-              key={idx}
-              className="bg-white shrink-0 w-24 p-4 rounded-2xl flex flex-col items-center gap-3 border border-gray-100"
-            >
-              <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-2xl shadow-inner">
-                {medal.icon}
+          {displayBadges.length > 0 ? (
+            displayBadges.map((badge) => (
+              <div
+                key={badge.id}
+                onClick={() => navigate("/medals")}
+                className="bg-gradient-to-b from-amber-50/80 to-white shrink-0 w-24 p-4 rounded-2xl flex flex-col items-center gap-3 border border-amber-200/60 cursor-pointer hover:shadow-md hover:border-amber-300 transition-all active:scale-95"
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-amber-50 rounded-full flex items-center justify-center text-2xl shadow-inner">
+                  {badge.icon}
+                </div>
+                <span className="text-[10px] text-gray-800 font-medium text-center leading-tight">
+                  {badge.name}
+                </span>
               </div>
-              <span className="text-[10px] text-black font-medium text-center leading-tight">
-                {medal.name}
-              </span>
+            ))
+          ) : (
+            <div className="w-full py-6 flex flex-col items-center text-gray-400">
+              <span className="text-2xl mb-2">🎖️</span>
+              <span className="text-xs">完成任务解锁勋章</span>
             </div>
-          ))}
+          )}
         </div>
       </section>
 
@@ -258,6 +315,13 @@ const Profile: React.FC = () => {
           {menuItems.map((item, idx) => (
             <button
               key={idx}
+              onClick={() => {
+                if (item.path) {
+                  navigate(item.path);
+                } else {
+                  alert("功能开发中，敬请期待");
+                }
+              }}
               className="w-full p-4 flex items-center gap-4 transition-all hover:bg-gray-50 active:bg-gray-100 group"
             >
               <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center transition-transform">

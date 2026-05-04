@@ -23,9 +23,13 @@ const SearchResults = React.lazy(() => import("./pages/SearchResults"));
 const ChatDetail = React.lazy(() => import("./pages/Chat/ChatDetail"));
 const GroupChatDetail = React.lazy(() => import("./pages/Chat/GroupChatDetail"));
 const CreateClub = React.lazy(() => import("./pages/Club/CreateClub"));
+const MyClubs = React.lazy(() => import("./pages/Club/MyClubs"));
 const CreateEvent = React.lazy(() => import("./pages/Event/CreateEvent"));
 const CategoryPosts = React.lazy(() => import("./pages/Post/CategoryPosts"));
 const PaperPlane = React.lazy(() => import("./pages/Toolbox/PaperPlane"));
+const MedalWall = React.lazy(() => import("./pages/MedalWall"));
+const MyPosts = React.lazy(() => import("./pages/MyPosts"));
+const MyCollections = React.lazy(() => import("./pages/MyCollections"));
 const Settings = React.lazy(() => import("./pages/Settings"));
 const ProfileSettings = React.lazy(() => import("./pages/Settings/ProfileSettings"));
 const AccountSettings = React.lazy(() => import("./pages/Settings/AccountSettings"));
@@ -52,8 +56,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isUserProfilePage = location.pathname.startsWith("/user/");
   const isSearchPage = location.pathname === "/search";
   const isClubCreatePage = location.pathname === "/clubs/create";
+  const isMyClubsPage = location.pathname === "/my-clubs";
   const isEventCreatePage = location.pathname === "/events/create";
   const isPaperPlanePage = location.pathname === "/toolbox/paper-plane";
+  const isMedalWallPage = location.pathname === "/medals";
+  const isMyPostsPage = location.pathname === "/my-posts";
+  const isMyCollectionsPage = location.pathname === "/my-collections";
   const isSettingsPage = location.pathname.startsWith("/settings");
   const hideBottomNav =
     isAuthPage ||
@@ -62,8 +70,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     isUserProfilePage ||
     isSearchPage ||
     isClubCreatePage ||
+    isMyClubsPage ||
     isEventCreatePage ||
     isPaperPlanePage ||
+    isMedalWallPage ||
+    isMyPostsPage ||
+    isMyCollectionsPage ||
     isSettingsPage;
 
   // Scroll to top on route change
@@ -122,9 +134,13 @@ function App() {
             <Route path="/user/:id/following" element={<FollowList />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/clubs/create" element={<CreateClub />} />
+            <Route path="/my-clubs" element={<MyClubs />} />
             <Route path="/events/create" element={<CreateEvent />} />
             <Route path="/posts/category/:type" element={<CategoryPosts />} />
             <Route path="/toolbox/paper-plane" element={<PaperPlane />} />
+            <Route path="/medals" element={<MedalWall />} />
+            <Route path="/my-posts" element={<MyPosts />} />
+            <Route path="/my-collections" element={<MyCollections />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/account" element={<AccountSettings />} />

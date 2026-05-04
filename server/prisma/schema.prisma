@@ -29,6 +29,7 @@ model User {
   following    Follow[]      @relation("following")
   clubs       Club[]   @relation("OwnedClubs")
   events      Event[]
+  userBadges  UserBadge[]
 
   @@map("users")
 }
@@ -119,4 +120,33 @@ model Follow {
 
   @@id([followerId, followingId])
   @@map("follows")
+}
+
+model Badge {
+  id             Int         @id @default(autoincrement())
+  key            String      @unique
+  name           String
+  icon           String
+  description    String      @db.Text
+  category       String      @default("achievement")
+  conditionType  String      @map("condition_type")
+  conditionValue Int         @map("condition_value")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  userBadges     UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  badgeId     Int      @map("badge_id")
+  isDisplayed Boolean  @default(false) @map("is_displayed")
+  unlockedAt  DateTime @default(now()) @map("unlocked_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+  badge       Badge    @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+  @@map("user_badges")
 }

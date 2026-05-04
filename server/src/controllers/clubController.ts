@@ -53,6 +53,21 @@ class ClubController {
       ctx.body = { error: "Failed to fetch club" };
     }
   }
+
+  async getMyClubs(ctx: Context) {
+    const userId = (ctx.state.user as { userId: number }).userId;
+    try {
+      const clubs = await prisma.club.findMany({
+        where: { ownerId: userId },
+        orderBy: { createdAt: "desc" }
+      });
+      ctx.body = clubs;
+    } catch (error) {
+      console.error("Fetch my clubs error:", error);
+      ctx.status = 500;
+      ctx.body = { error: "Failed to fetch your clubs" };
+    }
+  }
 }
 
 export default new ClubController();

@@ -7,3 +7,7 @@ export const createClub = (data: { name: string; description?: string; logo?: st
 export const getClubById = (id: number) => {
   return request.get(`/clubs/${id}`);
 };
+
+export const getMyClubs = () => {
+  return request.get("/clubs/my");
+};

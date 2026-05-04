@@ -12,6 +12,7 @@ export interface User {
     followedBy: number;
     following: number;
     interactions: number;
+    clubs: number;
   };
 }
 
