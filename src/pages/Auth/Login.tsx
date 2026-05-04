@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { login, register } from "../../services/authService";
 import { User, Lock, ArrowRight, Sparkles } from "lucide-react";
 import type { AuthResponse, ApiError } from "../../types";
+import { useSocket } from "../../context/SocketContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { connectSocket, refreshUnreadCount } = useSocket();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     username: "",
@@ -26,6 +28,11 @@ const LoginPage = () => {
         })) as unknown as AuthResponse;
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
+        
+        // Connect socket and fetch unread count immediately after login
+        connectSocket();
+        refreshUnreadCount();
+        
         navigate("/");
       } else {
         await register(formData);

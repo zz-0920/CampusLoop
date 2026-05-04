@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Camera, Loader2, ChevronDown } from 'lucide-react';
 import { getOwnedClubs, createEvent } from '../../services/eventService';
 import { uploadImage } from '../../services/postService';
-import { Club, UploadResponse } from '../../types';
+import type { Club, UploadResponse } from '../../types';
 
 const CreateEvent: React.FC = () => {
   const navigate = useNavigate();

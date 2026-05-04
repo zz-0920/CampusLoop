@@ -72,6 +72,9 @@ class PostController {
 
       if (type) {
         where.type = type;
+      } else {
+        // Exclude paper plane posts from the main feed
+        where.type = { not: "paper_plane" };
       }
 
       if (tab === "follow" && userId) {

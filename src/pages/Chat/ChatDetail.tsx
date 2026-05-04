@@ -28,7 +28,7 @@ const ChatDetail: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [contactUser, setContactUser] = useState<User | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { socket } = useSocket();
+  const { socket, refreshUnreadCount } = useSocket();
 
   // Read user from localStorage synchronously using useMemo
   const currentUser = React.useMemo<User | null>(() => {
@@ -63,13 +63,17 @@ const ChatDetail: React.FC = () => {
           Number(contactId)
         )) as unknown as Message[];
         setMessages(data);
+        // Refresh global unread count after marking messages as read
+        if (refreshUnreadCount) {
+           refreshUnreadCount();
+        }
       } catch (error) {
         console.error("Failed to load messages", error);
       }
     };
 
     fetchMessages();
-  }, [contactId]);
+  }, [contactId, refreshUnreadCount]);
 
   useEffect(() => {
     if (!socket || !contactId) return;

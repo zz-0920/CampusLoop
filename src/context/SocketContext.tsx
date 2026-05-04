@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useState,
   useRef,
+  useCallback,
 } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -11,12 +12,18 @@ interface SocketContextType {
   socket: Socket | null;
   unreadCount: number;
   isConnected: boolean;
+  connectSocket: () => void;
+  disconnectSocket: () => void;
+  refreshUnreadCount: () => void;
 }
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   unreadCount: 0,
   isConnected: false,
+  connectSocket: () => {},
+  disconnectSocket: () => {},
+  refreshUnreadCount: () => {},
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -29,8 +36,26 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<Socket | null>(null);
+  const refreshUnreadCount = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  useEffect(() => {
+    try {
+      const res = await fetch("http://localhost:3000/api/messages/unread-count", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (typeof data.unreadCount === 'number') {
+        setUnreadCount(data.unreadCount);
+      }
+    } catch (err) {
+      console.error("Failed to fetch unread count:", err);
+    }
+  }, []);
+
+  const connectSocket = useCallback(() => {
     const token = localStorage.getItem("token");
     const userStr = localStorage.getItem("user");
 
@@ -39,7 +64,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const user = JSON.parse(userStr);
 
-    // Auto-connect on mount if logged in
     const newSocket = io("http://localhost:3000", {
       auth: { token },
       reconnection: true,
@@ -53,6 +77,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("Global Socket Connected:", newSocket.id);
       setIsConnected(true);
       setSocket(newSocket);
+
+      // Fetch initial unread count
+      refreshUnreadCount();
     });
 
     newSocket.on("disconnect", () => {
@@ -63,23 +90,31 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
     // Global listener for new messages
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newSocket.on("receive_message", (message: any) => {
-      // Logic: If I am the receiver, increment unread count
-      // In a real app, we might check if we are currently looking at this chat
-      // For MVP, just increment global count
       if (message.receiverId === user.id) {
         setUnreadCount((prev) => prev + 1);
       }
     });
+  }, [refreshUnreadCount]);
 
-    // Cleanup
-    return () => {
-      newSocket.disconnect();
+  const disconnectSocket = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
       socketRef.current = null;
-    };
+      setSocket(null);
+      setIsConnected(false);
+    }
   }, []);
 
+  useEffect(() => {
+    connectSocket();
+    // Cleanup
+    return () => {
+      disconnectSocket();
+    };
+  }, [connectSocket, disconnectSocket]);
+
   return (
-    <SocketContext.Provider value={{ socket, unreadCount, isConnected }}>
+    <SocketContext.Provider value={{ socket, unreadCount, isConnected, connectSocket, disconnectSocket, refreshUnreadCount }}>
       {children}
     </SocketContext.Provider>
   );

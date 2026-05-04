@@ -271,6 +271,23 @@ class MessageController {
       ctx.body = { error: (error as Error).message };
     }
   }
+
+  // Get total unread count for current user
+  async getUnreadCount(ctx: Context) {
+    const userId = (ctx.state as AuthState).user.userId;
+    try {
+      const count = await prisma.message.count({
+        where: {
+          receiverId: userId,
+          isRead: false,
+        },
+      });
+      ctx.body = { unreadCount: count };
+    } catch (error) {
+      ctx.status = 500;
+      ctx.body = { error: (error as Error).message };
+    }
+  }
 }
 
 export default new MessageController();
