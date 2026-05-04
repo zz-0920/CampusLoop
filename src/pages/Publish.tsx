@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   X,
   Image,
@@ -8,9 +9,24 @@ import {
   ChevronRight,
   Globe,
   Plus,
+  Search,
+  Navigation,
+  ArrowLeft,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPost, uploadImage } from "../services/postService";
+
+declare global {
+  interface Window { AMap: any; _AMapSecurityConfig: any; }
+}
+
+interface POI {
+  id: string;
+  name: string;
+  address: string;
+  location: { lng: number; lat: number };
+  distance?: number;
+}
 
 const MAX_IMAGES = 9;
 
@@ -25,7 +41,24 @@ const Publish: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+
+  // Location state
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [nearbyPOIs, setNearbyPOIs] = useState<POI[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<POI[]>([]);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState<{
+    lng: number;
+    lat: number;
+  } | null>(null);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleImageClick = () => {
     if (images.length >= MAX_IMAGES) {
@@ -59,7 +92,6 @@ const Publish: React.FC = () => {
       alert("上传失败，请重试");
     } finally {
       setUploading(false);
-      // Reset input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -78,10 +110,10 @@ const Publish: React.FC = () => {
     try {
       await createPost({
         content,
-        // Store multiple images as comma-separated string or first image
         image: images.length > 0 ? images.join(",") : undefined,
         type: initialType,
         isAnonymous: isAnonymous,
+        location: selectedLocation || undefined,
       });
       if (initialType !== "normal") {
         navigate(`/posts/category/${initialType}`);
@@ -95,6 +127,179 @@ const Publish: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Get current location and nearby POIs
+  const getCurrentLocation = useCallback(() => {
+    if (!window.AMap) {
+      alert("地图服务加载中，请稍后再试");
+      return;
+    }
+
+    setLoadingLocation(true);
+
+    const geolocation = new window.AMap.Geolocation({
+      enableHighAccuracy: true,
+      timeout: 10000,
+      noIpLocate: 0,
+    });
+
+    geolocation.getCurrentPosition(
+      (status: string, result: any) => {
+        if (status === "complete" && result.position) {
+          const pos = {
+            lng: result.position.lng,
+            lat: result.position.lat,
+          };
+          setCurrentPosition(pos);
+          searchNearby(pos);
+        } else {
+          // Fallback: use IP-based location
+          geolocation.getCityInfo((status2: string, result2: any) => {
+            if (status2 === "complete" && result2.center) {
+              const pos = {
+                lng: result2.center[0],
+                lat: result2.center[1],
+              };
+              setCurrentPosition(pos);
+              searchNearby(pos);
+            } else {
+              setLoadingLocation(false);
+              console.error("定位失败", result2);
+            }
+          });
+        }
+      }
+    );
+  }, []);
+
+  // Search nearby POIs
+  const searchNearby = (pos: { lng: number; lat: number }) => {
+    const placeSearch = new window.AMap.PlaceSearch({
+      pageSize: 20,
+      pageIndex: 1,
+      extensions: "base",
+    });
+
+    placeSearch.searchNearBy(
+      "",
+      [pos.lng, pos.lat],
+      1000,
+      (status: string, result: any) => {
+        setLoadingLocation(false);
+        if (status === "complete" && result.poiList) {
+          const pois: POI[] = result.poiList.pois.map((poi: any) => ({
+            id: poi.id,
+            name: poi.name,
+            address: poi.address || "",
+            location: { lng: poi.location.lng, lat: poi.location.lat },
+            distance: poi.distance,
+          }));
+          setNearbyPOIs(pois);
+        }
+      }
+    );
+  };
+
+  // Search POIs by keyword
+  const searchPOIs = useCallback(
+    (keyword: string) => {
+      if (!window.AMap || !keyword.trim()) {
+        setSearchResults([]);
+        return;
+      }
+
+      const placeSearch = new window.AMap.PlaceSearch({
+        pageSize: 15,
+        pageIndex: 1,
+        extensions: "base",
+        city: currentPosition ? undefined : "全国",
+      });
+
+      const center = currentPosition
+        ? [currentPosition.lng, currentPosition.lat]
+        : undefined;
+
+      if (center) {
+        placeSearch.searchNearBy(
+          keyword,
+          center,
+          50000,
+          (status: string, result: any) => {
+            if (status === "complete" && result.poiList) {
+              const pois: POI[] = result.poiList.pois.map((poi: any) => ({
+                id: poi.id,
+                name: poi.name,
+                address: poi.address || "",
+                location: { lng: poi.location.lng, lat: poi.location.lat },
+              }));
+              setSearchResults(pois);
+            }
+          }
+        );
+      } else {
+        placeSearch.search(keyword, (status: string, result: any) => {
+          if (status === "complete" && result.poiList) {
+            const pois: POI[] = result.poiList.pois.map((poi: any) => ({
+              id: poi.id,
+              name: poi.name,
+              address: poi.address || "",
+              location: { lng: poi.location.lng, lat: poi.location.lat },
+            }));
+            setSearchResults(pois);
+          }
+        });
+      }
+    },
+    [currentPosition]
+  );
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+    if (searchQuery.trim()) {
+      searchTimerRef.current = setTimeout(() => {
+        searchPOIs(searchQuery);
+      }, 300);
+    } else {
+      setSearchResults([]);
+    }
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
+  }, [searchQuery, searchPOIs]);
+
+  // Open location picker
+  const openLocationPicker = () => {
+    setShowLocationPicker(true);
+    if (nearbyPOIs.length === 0) {
+      getCurrentLocation();
+    }
+  };
+
+  // Select a location
+  const selectLocation = (name: string) => {
+    setSelectedLocation(name);
+    setShowLocationPicker(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
+  // Remove location
+  const removeLocation = () => {
+    setSelectedLocation(null);
+  };
+
+  const formatDistance = (d?: number) => {
+    if (!d) return "";
+    if (d < 1000) return `${Math.round(d)}m`;
+    return `${(d / 1000).toFixed(1)}km`;
+  };
+
+  const displayPOIs = searchQuery.trim() ? searchResults : nearbyPOIs;
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white">
@@ -124,6 +329,7 @@ const Publish: React.FC = () => {
         {/* 2. Content Input Area */}
         <div className="flex-1 flex flex-col">
           <textarea
+            ref={textareaRef}
             placeholder="分享你的想法..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -178,7 +384,23 @@ const Publish: React.FC = () => {
             onChange={handleFileChange}
           />
 
-          {/* 3. Media Toolbar (Integrated) */}
+          {/* Selected Location Display */}
+          {selectedLocation && (
+            <div className="flex items-center gap-2 mb-4 px-3 py-2.5 bg-blue-50 rounded-xl border border-blue-100">
+              <MapPin size={14} className="text-blue-500 shrink-0" />
+              <span className="text-sm text-blue-700 flex-1 truncate">
+                {selectedLocation}
+              </span>
+              <button
+                onClick={removeLocation}
+                className="p-1 hover:bg-blue-100 rounded-full transition-colors"
+              >
+                <X size={14} className="text-blue-400" />
+              </button>
+            </div>
+          )}
+
+          {/* 3. Media Toolbar */}
           <div className="flex items-center justify-between border border-gray-100 rounded-2xl p-2 mb-6 bg-white">
             <div className="flex items-center gap-1">
               <button
@@ -187,13 +409,25 @@ const Publish: React.FC = () => {
               >
                 <Image size={24} />
               </button>
-              <button className="text-black hover:bg-gray-100 rounded-xl p-3 transition-colors">
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className={`rounded-xl p-3 transition-colors ${
+                  showEmojiPicker
+                    ? "text-blue-500 bg-blue-50"
+                    : "text-black hover:bg-gray-100"
+                }`}
+              >
                 <Smile size={24} />
               </button>
               <button className="text-black hover:bg-gray-100 rounded-xl p-3 transition-colors">
                 <Hash size={24} />
               </button>
-              <button className="text-black hover:bg-gray-100 rounded-xl p-3 transition-colors">
+              <button
+                onClick={openLocationPicker}
+                className={`hover:bg-gray-100 rounded-xl p-3 transition-colors ${
+                  selectedLocation ? "text-blue-500" : "text-black"
+                }`}
+              >
                 <MapPin size={24} />
               </button>
             </div>
@@ -225,12 +459,17 @@ const Publish: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex items-center justify-between bg-white border border-gray-100 rounded-2xl px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors">
+            <div
+              onClick={openLocationPicker}
+              className="flex items-center justify-between bg-white border border-gray-100 rounded-2xl px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+            >
               <div className="flex items-center gap-2 text-black">
                 <span className="text-sm font-bold">位置</span>
               </div>
               <div className="flex items-center gap-1 text-gray-400">
-                <span className="text-xs">添加地点</span>
+                <span className="text-xs truncate max-w-[160px]">
+                  {selectedLocation || "添加地点"}
+                </span>
                 <ChevronRight size={16} />
               </div>
             </div>
@@ -249,8 +488,138 @@ const Publish: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
 
+      {/* Location Picker Modal */}
+      {showLocationPicker && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col">
+          {/* Modal Header */}
+          <div className="sticky top-0 bg-white z-10 border-b border-gray-100">
+            <div className="flex items-center gap-3 p-4">
+              <button
+                onClick={() => {
+                  setShowLocationPicker(false);
+                  setSearchQuery("");
+                  setSearchResults([]);
+                }}
+                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <ArrowLeft size={22} className="text-black" />
+              </button>
+              <h2 className="text-lg font-bold text-black flex-1">选择位置</h2>
+              <button
+                onClick={() => {
+                  setSelectedLocation(null);
+                  setShowLocationPicker(false);
+                  setSearchQuery("");
+                  setSearchResults([]);
+                }}
+                className="text-xs text-gray-400 px-3 py-1.5 rounded-full border border-gray-100 hover:bg-gray-50"
+              >
+                不显示位置
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="px-4 pb-3">
+              <div className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2.5">
+                <Search size={16} className="text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="搜索地点"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 bg-transparent text-sm text-black outline-none placeholder:text-gray-400"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="p-0.5 rounded-full hover:bg-gray-200"
+                  >
+                    <X size={14} className="text-gray-400" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Relocate button */}
+            {!searchQuery && (
+              <button
+                onClick={getCurrentLocation}
+                disabled={loadingLocation}
+                className="mx-4 mb-3 flex items-center gap-2 px-3 py-2.5 text-sm text-blue-500 bg-blue-50 rounded-xl border border-blue-100 hover:bg-blue-100 transition-colors w-auto"
+              >
+                <Navigation size={14} />
+                {loadingLocation ? "定位中..." : "重新定位"}
+              </button>
+            )}
+          </div>
+
+          {/* POI List */}
+          <div className="flex-1 overflow-y-auto">
+            {loadingLocation && nearbyPOIs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                <div className="w-10 h-10 border-4 border-gray-100 border-t-blue-500 rounded-full animate-spin mb-3" />
+                <span className="text-sm">正在获取附近位置...</span>
+              </div>
+            ) : displayPOIs.length > 0 ? (
+              <div className="divide-y divide-gray-50">
+                {displayPOIs.map((poi) => (
+                  <button
+                    key={poi.id}
+                    onClick={() => selectLocation(poi.name)}
+                    className="w-full px-4 py-3.5 flex items-start gap-3 hover:bg-gray-50 active:bg-gray-100 transition-colors text-left"
+                  >
+                    <div className="w-9 h-9 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                      <MapPin size={16} className="text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-black truncate">
+                        {poi.name}
+                      </p>
+                      <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                        {poi.address}
+                        {poi.distance
+                          ? ` · ${formatDistance(poi.distance)}`
+                          : ""}
+                      </p>
+                    </div>
+                    {selectedLocation === poi.name && (
+                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0 mt-1">
+                        <svg
+                          width="10"
+                          height="8"
+                          viewBox="0 0 10 8"
+                          fill="none"
+                        >
+                          <path
+                            d="M1 4L3.5 6.5L9 1"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : searchQuery ? (
+              <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                <MapPin size={40} className="mb-3 opacity-30" />
+                <span className="text-sm">未找到相关地点</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                <MapPin size={40} className="mb-3 opacity-30" />
+                <span className="text-sm">点击"重新定位"获取附近位置</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
