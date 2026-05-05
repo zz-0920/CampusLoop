@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Send } from "lucide-react";
+import { ArrowLeft, Heart, Send, MapPin } from "lucide-react";
 import Avatar from "../components/Avatar";
 import CommentItem from "../components/CommentItem";
 import {
@@ -30,6 +30,7 @@ interface PostData {
   id: number;
   content: string;
   image?: string;
+  location?: string;
   createdAt: string;
   user: PostUser;
   likes: number;
@@ -213,9 +214,15 @@ const PostDetail: React.FC = () => {
               );
             })()}
 
-          {/* Time */}
-          <div className="text-xs text-gray-400 mb-3">
-            {formatTime(post.createdAt)}
+          {/* Time & Location */}
+          <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+            <span>{formatTime(post.createdAt)}</span>
+            {post.location && (
+              <span className="flex items-center gap-1">
+                <MapPin size={11} />
+                {post.location}
+              </span>
+            )}
           </div>
 
           {/* Actions */}

@@ -83,6 +83,7 @@ export const createPost = async (data: {
   image?: string;
   type?: string;
   isAnonymous?: boolean;
+  location?: string;
 }) => {
   return request.post("/posts", data);
 };

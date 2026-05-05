@@ -6,6 +6,7 @@ import {
   Bookmark,
   MoreHorizontal,
   Share2,
+  MapPin,
 } from "lucide-react";
 import Avatar from "./Avatar";
 import { interactPost } from "../services/postService";
@@ -29,6 +30,7 @@ interface Post {
   comments?: number;
   shares?: number;
   bookmarks?: number;
+  location?: string;
   author?: Author;
   user?: Author;
   _count?: {
@@ -146,6 +148,14 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             );
           })()}
       </div>
+
+      {/* Location */}
+      {post.location && (
+        <div className="flex items-center gap-1 mb-3 text-gray-400">
+          <MapPin size={12} />
+          <span className="text-[11px]">{post.location}</span>
+        </div>
+      )}
 
       {/* Interaction Footer */}
       <div className="flex items-center justify-between text-gray-400 pt-2">

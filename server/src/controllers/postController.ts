@@ -5,11 +5,12 @@ import prisma from "../utils/prisma.js";
 class PostController {
   // Create a new post
   async create(ctx: Context) {
-    const { content, image, type, isAnonymous } = ctx.request.body as {
+    const { content, image, type, isAnonymous, location } = ctx.request.body as {
       content?: string;
       image?: string;
       type?: string;
       isAnonymous?: boolean;
+      location?: string;
     };
     const userId = (ctx.state.user as { userId: number }).userId;
 
@@ -27,6 +28,7 @@ class PostController {
           image: image ?? null,
           type: type || "normal",
           isAnonymous: !!isAnonymous,
+          location: location || null,
           userId,
         },
         include: {

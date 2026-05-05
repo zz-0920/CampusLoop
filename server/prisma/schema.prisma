@@ -41,6 +41,7 @@ model Post {
   image     String?  @db.Text
   type      String   @default("normal")
   isAnonymous Boolean @default(false) @map("is_anonymous")
+  location  String?
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id])
   interactions Interaction[]
